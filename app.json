@@ -1,0 +1,11 @@
+{
+  "pages":[
+    "pages/start/start"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "swiper",
+    "navigationBarTextStyle":"black"
+  }
+}
