@@ -2,7 +2,8 @@
   "pages": [
     "pages/start/start",
     "pages/index/index",
-    "pages/my/my"
+    "pages/my/my",
+    "pages/goods-details/goods-details"
   ],
   "window": {
     "backgroundTextStyle": "light",

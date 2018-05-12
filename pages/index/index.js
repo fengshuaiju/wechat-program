@@ -3,8 +3,6 @@
 var app = getApp()
 Page({
   data: {
-    indicatorDots: true,
-
     //轮播图
     //是否自动播放
     autoplay: true,
@@ -13,35 +11,35 @@ Page({
     //滑动动画时长
     duration: 1000,
 
-
     //用户信息
     userInfo: {},
 
     //轮播图是否播放到当前图片标志
     swiperCurrent: 0,
 
-    selectCurrent:0,
-
     //服装类型：童装，上衣。。。
     categories: [],
 
     activeCategoryId: 0,
+    //商品数组
     goods:[],
+    //上层搜索框
     scrollTop:"0",
 
     //是否已经加载到最后了
     loadingMoreHidden:true,
 
+    //是否为用户显示优惠券
     hasNoCoupons:true,
+    //优惠券列表
     coupons: [],
+    //搜索输入框内容
     searchInput: '',
-
-
-
-
 
     //没有用到的变量
     loadingHidden: false, // loading
+    selectCurrent: 0,
+    indicatorDots: true,
   },
 
   tabClick: function (e) {
@@ -61,7 +59,7 @@ Page({
 
   toDetailsTap:function(e){
     wx.navigateTo({
-      url:"/pages/goods-details/index?id="+e.currentTarget.dataset.id
+      url:"/pages/goods-details/goods-details?id="+e.currentTarget.dataset.id
     })
   },
 
