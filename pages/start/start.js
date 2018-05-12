@@ -12,6 +12,8 @@ Page({
       url: '/pages/index/index',
     });
   },
+
+  //页面加载完之后执行
   onLoad:function(){
     var that = this
     wx.setNavigationBarTitle({
@@ -23,6 +25,7 @@ Page({
       })
     })
   },
+  
   onShow:function(){
 
   },
