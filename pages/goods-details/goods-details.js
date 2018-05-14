@@ -18,7 +18,7 @@ Page({
     //是否有多种规格可选择
     hasMoreSelect:false,
 
-    //有多种样式的话，要选择的样式‘文字’
+    //有多种样式的话，要选择的样式‘文字’,如 颜色、尺寸
     selectSize:"选择：",
 
     //点击购买后弹出框中，商品的价格
@@ -37,6 +37,8 @@ Page({
     //最多购买件数
     buyNumMax:0,
 
+    //该商品是否参与砍价，默认没有砍价的功能
+    curGoodsKanjia: false,
 
     propertyChildIds:"",
     propertyChildNames:"",
@@ -44,6 +46,7 @@ Page({
     //选中规格尺寸时候是否允许加入购物车
     canSubmit:false,
 
+    //购物车中的信息
     shopCarInfo:{},
     shopType: "addShopCar",//购物类型，加入购物车或立即购买，默认为加入购物车
   },
@@ -57,6 +60,7 @@ Page({
   },
 
   onLoad: function (e) {
+    //存储邀请人ID
     if (e.inviter_id) {
       wx.setStorage({
         key: 'inviter_id_' + e.id,
@@ -64,7 +68,7 @@ Page({
       })
     }
     var that = this;
-    // 获取购物车数据
+    // 从本地存储中获取购物车数据，（后期改为从网络中获取）
     wx.getStorage({
       key: 'shopCarInfo',
       success: function(res) {
@@ -74,6 +78,7 @@ Page({
         });
       } 
     })
+    //获取商品的详细信息
     wx.request({
       url: 'https://api.it120.cc/'+ app.globalData.subDomain +'/shop/goods/detail',
       data: {
@@ -92,20 +97,26 @@ Page({
           });
         }
         that.data.goodsDetail = res.data.data;
+        //如果返回的商品详情中有 video 地址，则拿着 videoId 去获取 video 信息
         if (res.data.data.basicInfo.videoId) {
           that.getVideoSrc(res.data.data.basicInfo.videoId);
         }
         that.setData({
           goodsDetail:res.data.data,
           selectSizePrice:res.data.data.basicInfo.minPrice,
+          //最多购买数，等于仓库剩余数
           buyNumMax:res.data.data.basicInfo.stores,
+          //当前购买数
           buyNumber:(res.data.data.basicInfo.stores>0) ? 1: 0
         });
         WxParse.wxParse('article', 'html', res.data.data.content, that, 5);
       }
     })
+    //获得商品的好评数
     this.reputation(e.id);
-    this.getKanjiaInfo(e.id);
+
+    //获取商品是否砍价信息
+    //this.getKanjiaInfo(e.id);
   },
 
   //跳转到购物车界面
@@ -238,7 +249,6 @@ Page({
       })
     }
 
-    
     this.setData({
       goodsDetail: that.data.goodsDetail,
       canSubmit:canSubmit
@@ -421,6 +431,7 @@ Page({
     buyNowInfo.shopList.push(shopCarMap);
     return buyNowInfo;
   },   
+  //转发小程序
   onShareAppMessage: function () {
     return {
       title: this.data.goodsDetail.basicInfo.name,
@@ -433,6 +444,8 @@ Page({
       }
     }
   },
+
+  //获取商品的星级（好评数）
   reputation: function (goodsId) {
     var that = this;
     wx.request({
@@ -450,6 +463,7 @@ Page({
       }
     })
   },
+  //获取video信息
   getVideoSrc: function (videoId) {
     var that = this;
     wx.request({
@@ -466,6 +480,8 @@ Page({
       }
     })
   },
+
+  //砍价
   getKanjiaInfo: function (gid) {
     var that = this;
     if (!app.globalData.kanjiaList || app.globalData.kanjiaList.length == 0){
@@ -487,6 +503,8 @@ Page({
       });
     }
   },
+
+  //进入砍价页面
   goKanjia: function () {
     var that = this;
     if (!that.data.curGoodsKanjia) {
