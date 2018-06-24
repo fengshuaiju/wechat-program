@@ -42,6 +42,30 @@ Page({
     indicatorDots: true,
   },
 
+  accessAuthorization: function () {
+    var that = this;
+    // 查看是否授权
+    wx.getSetting({
+      success: function (res) {
+        if (res.authSetting['scope.userInfo']) {
+          // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+          wx.getUserInfo({
+            success: function (res) {
+              console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU" + that.data.flag);
+              console.log(res);
+              that.setData({
+                flag: true
+              });
+
+            }
+          })
+        }
+      }
+
+    })
+  },
+
+  //点击类型，将服饰类型传入
   tabClick: function (e) {
     this.setData({
       activeCategoryId: e.currentTarget.id
@@ -57,6 +81,7 @@ Page({
     })  
   },
 
+  //跳转到商品详情页面
   toDetailsTap:function(e){
     wx.navigateTo({
       url:"/pages/goods-details/goods-details?id="+e.currentTarget.dataset.id
@@ -64,12 +89,12 @@ Page({
   },
 
   /**
-   * 点击图片时，进行小程序内的跳转
+   * 点击轮播图片时，进行小程序内的跳转
    */
   tapBanner: function(e) {
     if (e.currentTarget.dataset.id != 0) {
       wx.navigateTo({
-        url: "/pages/goods-details/index?id=" + e.currentTarget.dataset.id
+        url: "/pages/goods-details/goods-details?id=" + e.currentTarget.dataset.id
       })
     }
   },
@@ -93,15 +118,6 @@ Page({
     wx.setNavigationBarTitle({
       title: wx.getStorageSync('mallName')
     })
-    /*
-    //调用应用实例的方法获取全局数据
-    app.getUserInfo(function(userInfo){
-      //更新数据
-      that.setData({
-        userInfo:userInfo
-      })
-    })
-    */
 
     /**
      * 获取轮播图中的图片
@@ -125,6 +141,7 @@ Page({
         }
       }
     })
+    //获取服装种类
     wx.request({
       url: 'https://api.it120.cc/'+ app.globalData.subDomain +'/shop/goods/category/all',
       success: function(res) {
@@ -144,6 +161,7 @@ Page({
     that.getCoupons ();
     that.getNotice ();
   },
+  //获取服装列表
   getGoodsList: function (categoryId) {
     if (categoryId == 0) {
       categoryId = "";
@@ -177,6 +195,7 @@ Page({
       }
     })
   },
+  //获取红包列表
   getCoupons: function () {
     var that = this;
     wx.request({
@@ -194,6 +213,7 @@ Page({
       }
     })
   },
+  //领取红包
   gitCoupon : function (e) {
     var that = this;
     wx.request({
@@ -251,6 +271,7 @@ Page({
       }
     })
   },
+  //转发小程序
   onShareAppMessage: function () {
     return {
       title: wx.getStorageSync('mallName') + '——' + app.globalData.shareProfile,
@@ -263,6 +284,7 @@ Page({
       }
     }
   },
+  //获取通知
   getNotice: function () {
     var that = this;
     wx.request({
@@ -277,12 +299,14 @@ Page({
       }
     })
   },
+  //监听搜索输入，将输入的内容赋值到变量上
   listenerSearchInput: function (e) {
     this.setData({
       searchInput: e.detail.value
     })
 
   },
+  //点击搜索，进行搜索
   toSearch : function (){
     this.getGoodsList(this.data.activeCategoryId);
   }

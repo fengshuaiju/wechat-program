@@ -18,7 +18,8 @@ Page({
     this.getUserApiInfo();
     this.getUserAmount();
     this.checkScoreSign();
-  },	
+  },
+  //获取用户信息
   getUserInfo: function (cb) {
       var that = this
       wx.login({
@@ -28,11 +29,13 @@ Page({
               that.setData({
                 userInfo: res.userInfo
               });
+              //发送用户信息
             }
           })
         }
       })
   },
+  //关于我们
   aboutUs : function () {
     wx.showModal({
       title: '关于我们',
@@ -40,6 +43,7 @@ Page({
       showCancel:false
     })
   },
+  //绑定手机号码
   getPhoneNumber: function(e) {
     if (!e.detail.errMsg || e.detail.errMsg != "getPhoneNumber:ok") {
       wx.showModal({
@@ -75,6 +79,7 @@ Page({
       }
     })
   },
+  
   getUserApiInfo: function () {
     var that = this;
     wx.request({
@@ -149,6 +154,7 @@ Page({
       }
     })
   },
+  //重新登录
   relogin:function(){
     var that = this;
     wx.authorize({

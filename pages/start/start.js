@@ -5,9 +5,15 @@ Page({
   data: {
     remind: '加载中',
     angle: 0,
-    userInfo: {}
+    userInfo: {},
+    //授权获取用户信息使用
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    flag : false
   },
+
+  //跳转到商品页面
   goToIndex:function(){
+    var that = this;
     wx.switchTab({
       url: '/pages/index/index',
     });
@@ -24,6 +30,13 @@ Page({
         userInfo: userInfo
       })
     })
+
+  },
+
+  //获取用户信息使用,在授权按钮的时候触发事件
+  bindGetUserInfo: function (e) {
+    console.log("===================================>>>>>>>>>>>>>>>>>>>>>");
+    console.log(e.detail.userInfo);
   },
   
   onShow:function(){

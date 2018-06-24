@@ -12,10 +12,17 @@
         <image class="wave wave-bg" src="/images/more/wave.png" mode="aspectFill"></image>
       </view>
       <view class="bd">
-         <image class="smalltitle" src="/images/more/confirm-word1.png"></image>
-        <view class="confirm-btn" bindtap='goToIndex'>
-          <text >进入店铺</text>
-        </view>
+        <image class="smalltitle" src="/images/more/confirm-word1.png"></image>
+        <button class = "confirm-btn" wx:if="{{canIUse}}" open-type="getUserInfo" 
+            bindtap='goToIndex'>
+            进入店铺
+        </button>
+        <!--
+        <button class = "confirm-btn" wx:if="{{canIUse}}" 
+        open-type="getUserInfo" bindgetuserinfo="bindGetUserInfo" bindtap='goToIndex'>进入店铺
+        </button>
+        -->
+        <!-- <view class="confirm-btn" bindtap='goToIndex'><text>进入店铺</text></view> -->
         <text class="copyright">@qindiandadudu 贡献本页代码</text>
       </view>
     </view>
