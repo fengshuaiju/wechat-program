@@ -11,7 +11,6 @@
  * for: 微信小程序富文本解析
  * detail : http://weappdev.com/t/wxparse-alpha0-1-html-markdown/184
  */
-
 function getDefaultOpts(simple) {
   'use strict';
 
@@ -1783,6 +1782,7 @@ showdown.subParser('hashHTMLBlocks', function (text, options, globals) {
 /**
  * Hash span elements that should not be parsed as markdown
  */
+
 showdown.subParser('hashHTMLSpans', function (text, config, globals) {
   'use strict';
 
@@ -2529,4 +2529,8 @@ showdown.subParser('unescapeSpecialChars', function (text) {
   });
   return text;
 });
-module.exports = showdown;
+
+module.exports = {
+  showdown: showdown,
+}
+

@@ -1,3 +1,4 @@
+var app = getApp();
 function wxpay(app, money, orderId, redirectUrl) {
   let remark = "在线充值";
   let nextAction = {};
@@ -6,7 +7,7 @@ function wxpay(app, money, orderId, redirectUrl) {
     nextAction = { type: 0, id: orderId };
   }
   wx.request({
-    url: 'https://api.it120.cc/' + app.globalData.subDomain + '/pay/wxapp/get-pay-data',
+    url: app.globalData.urls + '/pay/wxapp/get-pay-data',
     data: {
       token:app.globalData.token,
       money:money,
@@ -25,7 +26,7 @@ function wxpay(app, money, orderId, redirectUrl) {
           signType:'MD5',
           paySign:res.data.data.sign,
           fail:function (aaa) {
-            wx.showToast({title: '支付失败:' + aaa})
+            wx.showToast({title: '支付失败'})
           },
           success:function () {
             wx.showToast({title: '支付成功'})

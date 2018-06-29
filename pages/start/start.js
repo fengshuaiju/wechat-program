@@ -1,63 +1,67 @@
 //login.js
 //获取应用实例
 var app = getApp();
+function countdown(that) {
+  var second = that.data.second;
+  var home = that.data.home;
+  if (home == 0) {
+    if (second == 0) {
+      wx.switchTab({
+        url: '../index/index'
+      })
+    }
+  }
+  var time = setTimeout(function () {
+    that.setData({
+      second: second - 1
+    });
+    countdown(that);
+  }
+    , 1000)
+
+}
 Page({
   data: {
-    remind: '加载中',
-    angle: 0,
-    userInfo: {},
-    //授权获取用户信息使用
-    canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    flag : false
+    second: 6,
+    home: 0
   },
 
-  //跳转到商品页面
-  goToIndex:function(){
-    var that = this;
+  home: function () {
+    this.setData({
+      home: 1
+    });
     wx.switchTab({
-      url: '/pages/index/index',
-    });
-  },
-
-  //页面加载完之后执行
-  onLoad:function(){
-    var that = this
-    wx.setNavigationBarTitle({
-      title: wx.getStorageSync('mallName')
+      url: '../index/index'
     })
-    app.getUserInfo(function(userInfo){
-      that.setData({
-        userInfo: userInfo
-      })
-    })
-
   },
-
-  //获取用户信息使用,在授权按钮的时候触发事件
-  bindGetUserInfo: function (e) {
-    console.log("===================================>>>>>>>>>>>>>>>>>>>>>");
-    console.log(e.detail.userInfo);
-  },
-  
-  onShow:function(){
-
-  },
-  onReady: function(){
-    var that = this;
-    setTimeout(function(){
-      that.setData({
-        remind: ''
+  //点击广告
+  tapBanner: function (e) {
+    if (e.currentTarget.dataset.id != 0) {
+      this.setData({
+        home: 1
       });
-    }, 1000);
-    wx.onAccelerometerChange(function(res) {
-      var angle = -(res.x*30).toFixed(1);
-      if(angle>14){ angle=14; }
-      else if(angle<-14){ angle=-14; }
-      if(that.data.angle !== angle){
-        that.setData({
-          angle: angle
-        });
+      wx.redirectTo({
+        url: "/pages/goods-details/index?id=" + e.currentTarget.dataset.id + '&share=1'
+      })
+    }
+  },
+  onLoad: function () {
+    var that = this;
+    countdown(that);
+    wx.request({
+      url: app.globalData.urls + '/banner/list',
+      data: {
+        key: 'mallName',
+        type: 'start'
+      },
+      success: function (res) {
+        if (res.data.code == 0) {
+          that.setData({
+            sales: res.data.data
+          });
+        }
       }
-    });
+    })
+
   }
 });

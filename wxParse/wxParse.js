@@ -100,7 +100,6 @@ function calMoreImageInfo(e, idx, that, bindName) {
     [keyH]: recal.imageheight,
   })
 }
-
 // 计算视觉优先的图片宽高
 function wxAutoImageCal(originalWidth, originalHeight,that,bindName) {
   //获取图片的原始长宽
@@ -145,12 +144,13 @@ function wxParseTemArray(temArrayName,bindNameReg,total,that){
  * 配置emojis
  * 
  */
+
 function emojisInit(reg='',baseSrc="/wxParse/emojis/",emojis){
    HtmlToJson.emojisInit(reg,baseSrc,emojis);
 }
-
 module.exports = {
   wxParse: wxParse,
-  wxParseTemArray:wxParseTemArray,
-  emojisInit:emojisInit
+  html2json: HtmlToJson
 }
+
+
