@@ -34,7 +34,7 @@ Page({
       url: '../index/index'
     })
   },
-  //点击广告
+  //点击广告，跳转详情页
   tapBanner: function (e) {
     if (e.currentTarget.dataset.id != 0) {
       this.setData({
@@ -49,7 +49,7 @@ Page({
     var that = this;
     countdown(that);
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/baby/banner/list',
       data: {
         key: 'mallName',
         type: 'start'
