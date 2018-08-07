@@ -184,14 +184,14 @@ Page({
     }
     //首页顶部Logo
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/baby/banner/list',
       data: {
         type: 'toplogo'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            toplogo: res.data.data[0].picUrl,
+            toplogo: res.data.picUrl,
             topname: wx.getStorageSync('mallName')
           });
         }
@@ -199,84 +199,84 @@ Page({
     })
     //首页幻灯片
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/baby/banner/list',
       data: {
         type: 'home'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            banners: res.data.data
+            banners: res.data
           });
         }
       }
     })
     //4个功能展示位
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/baby/banner/list',
       data: {
         key: 'mallName',
         type: 'sale'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            sales: res.data.data
+            sales: res.data
           });
         }
       }
     })
     //获取拼团商品信息
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/baby/banner/list',
       data: {
         type: 'toptuan'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           wx.request({
-            url: app.globalData.urls + '/config/get-value',
+            url: app.globalData.urls + '/baby/open/config/get-value',
             data: {
               key: 'toptuan',
             },
             success: function (res) {
-              if (res.data.code == 0) {
+              if (res.statusCode == 200) {
                 that.setData({
-                  toptuaninfo: res.data.data
+                  toptuaninfo: res.data
                 });
               }
             }
           })
           that.setData({
-            toptuan: res.data.data
+            toptuan: res.data
           });
         }
       }
     })
     //获取砍价商品信息
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/baby/banner/list',
       data: {
         key: 'mallName',
         type: 'topkan'
       },
       success: function (res) {
-        if (res.data.code == 0) {
-          var kb = res.data.data[0].remark;
+        if (res.statusCode == 200) {
+          var kb = res.data[0].remark;
           var kbarr = kb.split(',');
           that.setData({
-            topkan: res.data.data
+            topkan: res.data
           });
           var topkans = [];
           for (var i = 0; i < kbarr.length; i++) {
             wx.request({
-              url: app.globalData.urls + '/shop/goods/detail',
+              url: app.globalData.urls + '/baby/shop/goods/detail',
               data: {
                 id: kbarr[i]
               },
               success: function (res) {
-                if (res.data.code == 0) {
-                  topkans.push(res.data.data.basicInfo);
+                if (res.statusCode == 200) {
+                  topkans.push(res.data.basicInfo);
                 }
                 that.setData({
                   topkans: topkans
@@ -290,28 +290,28 @@ Page({
     })
     //获取精选专题信息
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/baby/banner/list',
       data: {
         key: 'mallName',
         type: 'toptopic'
       },
       success: function (res) {
-        if (res.data.code == 0) {
-          var kb = res.data.data[0].remark;
+        if (res.statusCode == 200) {
+          var kb = res.data[0].remark;
           var kbarr = kb.split(',');
           that.setData({
-            toptopic: res.data.data
+            toptopic: res.data
           });
           var toptopics = [];
           for (var i = 0; i < kbarr.length; i++) {
             wx.request({
-              url: app.globalData.urls + '/cms/news/detail',
+              url: app.globalData.urls + '/baby/cms/news/detail',
               data: {
                 id: kbarr[i]
               },
               success: function (res) {
-                if (res.data.code == 0) {
-                  toptopics.push(res.data.data);
+                if (res.statusCode == 200) {
+                  toptopics.push(res.data);
                 }
                 that.setData({
                   toptopics: toptopics
@@ -324,17 +324,17 @@ Page({
     })
     //获取推荐商品信息
     wx.request({
-      url: app.globalData.urls + '/config/get-value',
+      url: app.globalData.urls + '/baby/open/config/get-value',
       data: {
         key: 'topgoods'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            topgoods: res.data.data
+            topgoods: res.data
           });
           wx.request({
-            url: app.globalData.urls + '/shop/goods/list',
+            url: app.globalData.urls + '/baby/shop/goods/list',
             data: {
               recommendStatus: 1,
               pageSize: 10
@@ -345,14 +345,15 @@ Page({
                 loadingMoreHidden: true
               });
               var goods = [];
-              if (res.data.code != 0 || res.data.data.length == 0) {
+              if (res.statusCode != 200 || res.data.length == 0) {
                 that.setData({
                   loadingMoreHidden: false,
                 });
                 return;
               }
-              for (var i = 0; i < res.data.data.length; i++) {
-                goods.push(res.data.data[i]);
+
+              for (var i = 0; i < res.data.length; i++) {
+                goods.push(res.data[i]);
               }
               that.setData({
                 goods: goods,
@@ -366,48 +367,55 @@ Page({
     //新用户领取优惠券
     setTimeout(function () {
       wx.request({
-        url: app.globalData.urls + '/banner/list',
+        url: app.globalData.urls + '/baby/banner/list',
         data: {
           key: 'mallName',
           type: 'newcoupons'
         },
         success: function (res) {
-          if (res.data.code == 0) {
-            wx.request({//识别用户是否可以领取优惠券
-              url: app.globalData.urls + '/discounts/fetch',
-              data: {
-                id: res.data.data[0].businessId,//优惠券id
-                token: app.globalData.token,
-                detect: true
-              },
-              success: function (res) {
-                if (res.data.code == 0) {
-                  that.setData({ flag: false })
-                }
-              }
-            });
+
+          if (res.statusCode == 200) {
+
+          //暂时把领取优惠券的窗口一直打开
+
+            // wx.request({//识别用户是否可以领取优惠券
+            //   //https://api.it120.cc/formatTime/discounts/fetch?id=2495&token=f3dc9820-d506-4f8a-9116-8609f64cb910&detect=true
+            //   url: app.globalData.urls + '/discounts/fetch',
+            //   data: {
+            //     id: res.data.data[0].businessId,//优惠券id
+            //     token: app.globalData.token,
+            //     detect: true
+            //   },
+            //   success: function (res) {
+            //     if (res.data.code == 0) {
+            //       that.setData({ flag: false })
+            //     }
+            //   }
+            // });
+
+            that.setData({ flag: false });
+
             that.setData({
-              newcoupons: res.data.data[0]
+              newcoupons: res.data
             });
           }
         }
       })
-    }, 500
+    }, 1000
     )
   },
   getkangoods: function (e) {
     var that = this;
     var pics = that.data.pics;
     wx.request({
-      url: app.globalData.urls + '/shop/goods/kanjia/list',
+      url: app.globalData.urls + '/baby/shop/goods/kanjia/list',
       data: {},
       success: function (res) {
-
-        if (res.data.code == 0) {
-          var result = res.data.data.result
+        if (res.statusCode == 200) {
+          var result = res.data.result
           for (var i = 0; i < result.length; i++) {
             if (e == result[i].goodsId) {
-              pics[e] = result[i]
+              pics[e] = result[i];
             }
           }
           that.setData({

@@ -22,7 +22,7 @@ function countdown(that) {
 }
 Page({
   data: {
-    second: 6,
+    second: 1,
     home: 0
   },
 

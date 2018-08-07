@@ -90,14 +90,14 @@ Page({
     
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/baby/banner/list',
       data: {
         type: 'toplogo'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            toplogo: res.data.data[0].picUrl,
+            toplogo: res.data.picUrl,
             topname: wx.getStorageSync('mallName')
           });
         }
