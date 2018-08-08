@@ -12,23 +12,23 @@ Page({
     var that = this;
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     wx.request({
-      url: app.globalData.urls + '/cms/category/list',
+      url: app.globalData.urls + '/baby/cms/category/list',
       data: {
       },
       success: function (res) {
         //console.log(res.data.data[0].id)
         var topic = []
-        if (res.data.code == 0) {
-          for (var i = 0; i < res.data.data.length; i++) {
-            topic.push(res.data.data[i]);
+        if (res.statusCode == 200) {
+          for (var i = 0; i < res.data.length; i++) {
+            topic.push(res.data[i]);
           }
           that.setData({
             topics: topic,
-            activecmsid: res.data.data[0].id
+            activecmsid: res.data[0].id
           });
 
         }
-        that.gettapList(res.data.data[0].id)
+        that.gettapList(res.data[0].id)
       }
     })
 
@@ -42,13 +42,13 @@ Page({
   gettapList: function (cmsid) {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/cms/news/list',
+      url: app.globalData.urls + '/baby/cms/news/list',
       success: function (res) {
         var content = [];
-        if (res.data.code == 0) {
-          for (var i = 0; i < res.data.data.length; i++) {
-            if (res.data.data[i].categoryId == cmsid) {
-              content.push(res.data.data[i]);
+        if (res.statusCode == 200) {
+          for (var i = 0; i < res.data.length; i++) {
+            if (res.data[i].categoryId == cmsid) {
+              content.push(res.data[i]);
             }
           }
         }

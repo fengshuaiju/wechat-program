@@ -15,8 +15,8 @@ App({
         key: "mallName"
       },
       success: function (res) {
-        if (res.data.code == 0) {
-          wx.setStorageSync("mallName", res.data.data.value);
+        if (res.statusCode == 200) {
+          wx.setStorageSync("mallName", res.data.value);
         }
       }
     });
@@ -26,8 +26,8 @@ App({
         code: "goodReputation"
       },
       success: function (res) {
-        if (res.data.code == 0) {
-          that.globalData.order_reputation_score = res.data.data[0].score;
+        if (res.statusCode == 200) {
+          that.globalData.order_reputation_score = res.data[0].score;
         }
       }
     });
@@ -37,8 +37,9 @@ App({
         key: "recharge_amount_min"
       },
       success: function (res) {
-        if (res.data.code == 0) {
-          that.globalData.recharge_amount_min = res.data.data.value;
+        if (res.statusCode == 200) {
+          //that.globalData.recharge_amount_min = res.data.value;
+          that.globalData.recharge_amount_min = 0;
         }
       }
     });
@@ -46,8 +47,8 @@ App({
       url: that.globalData.urls + "/baby/shop/goods/kanjia/list",
       data: {},
       success: function (res) {
-        if (res.data.code == 0) {
-          that.globalData.kanjiaList = res.data.data.result;
+        if (res.statusCode == 200) {
+          that.globalData.kanjiaList = res.data.result;
         }
       }
     });
@@ -140,7 +141,6 @@ App({
       }
     })
   },
-
 
   urls: function () {
     var that = this;

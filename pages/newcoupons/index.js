@@ -11,6 +11,7 @@ Page({
     this.data.coupons = e.detail.value;
     this.data.id = e.currentTarget.dataset.id;
   },
+  //兑换
   listenerDuiHuan: function () {
     //console.log('id', this.data.coupons);
     wx.request({
@@ -60,16 +61,16 @@ Page({
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     that.getCoupons();
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/baby/banner/list',
       data: {
         key: 'mallName',
         type: 'duihuan'
       },
       success: function (res) {
-        if (res.data.code == 0 && app.globalData.system != 'key') {
+        if (res.statusCode == 200 && app.globalData.system != 'key') {
           that.setData({
-            banners: res.data.data,
-            busid: res.data.data[0].businessId
+            banners: res.data,
+            busid: res.data[0].businessId
           });
         }
       }
@@ -78,20 +79,21 @@ Page({
   getCoupons: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/discounts/coupons',
+      url: app.globalData.urls + '/baby/discounts/coupons',
       data: {
         type: 'shop'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
             hasNoCoupons: false,
-            coupons: res.data.data
+            coupons: res.data
           });
         }
       }
     })
   },
+  //点击领取礼券
   gitCoupon: function (e) {
     var that = this;
     wx.request({

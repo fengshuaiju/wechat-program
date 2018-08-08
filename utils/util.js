@@ -1,3 +1,4 @@
+var app = getApp();
 function formatTime(date) {
   var year = date.getFullYear()
   var month = date.getMonth() + 1
@@ -11,6 +12,29 @@ function formatNumber(n) {
   n = n.toString()
   return n[1] ? n : '0' + n
 }
+
+function order() {
+  wx.request({
+    url: app.globalData.urls + '/baby/order/statistics',
+    data: { token: app.globalData.token },
+    success: function (res) {
+      if (res.data.code == 0) {
+        if (res.data.data.count_id_no_pay > 0) {
+          wx.setTabBarBadge({
+            index: 3,
+            text: '' + res.data.data.count_id_no_pay + ''
+          })
+        } else {
+          wx.removeTabBarBadge({
+            index: 3,
+          })
+        }
+      }
+    }
+  })
+}
+
 module.exports = {
-  formatTime: formatTime
+  formatTime: formatTime,
+  order: order
 }

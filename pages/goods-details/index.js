@@ -2,6 +2,7 @@
 //获取应用实例
 var app = getApp();
 var WxParse = require('../../wxParse/wxParse.js');
+var util = require('../../utils/util.js')
 
 Page({
   data: {
@@ -86,8 +87,6 @@ Page({
       })
     }
 
-    
-    
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     wx.request({
       url: app.globalData.urls + '/baby/banner/list',
@@ -115,53 +114,52 @@ Page({
       }
     })
     wx.request({
-      url: app.globalData.urls + '/shop/goods/detail',
+      url: app.globalData.urls + '/baby/shop/goods/detail',
       data: {
         id: that.data.id
       },
       success: function (res) {
-
         var selectSizeTemp = "";
-        if (res.data.data.properties) {
-          for (var i = 0; i < res.data.data.properties.length; i++) {
-            selectSizeTemp = selectSizeTemp + " " + res.data.data.properties[i].name;
+        if (res.data.properties) {
+          for (var i = 0; i < res.data.properties.length; i++) {
+            selectSizeTemp = selectSizeTemp + " " + res.data.properties[i].name;
           }
           that.setData({
             hasMoreSelect: true,
             selectSize: that.data.selectSize + selectSizeTemp,
-            selectSizePrice: res.data.data.basicInfo.minPrice,
-            selectptPrice: res.data.data.basicInfo.pingtuanPrice
+            selectSizePrice: res.data.basicInfo.minPrice,
+            selectptPrice: res.data.basicInfo.pingtuanPrice
           });
         }
-        that.data.goodsDetail = res.data.data;
-        if (res.data.data.basicInfo.videoId) {
-          that.getVideoSrc(res.data.data.basicInfo.videoId);
+        if (res.data.basicInfo.videoId) {
+          that.getVideoSrc(res.data.basicInfo.videoId);
         }
         that.setData({
-          goodsDetail: res.data.data,
-          selectSizePrice: res.data.data.basicInfo.minPrice,
-          buyNumMax: res.data.data.basicInfo.stores,
-          buyNumber: (res.data.data.basicInfo.stores > 0) ? 1 : 0,
-          selectptPrice: res.data.data.basicInfo.pingtuanPrice
+          goodsDetail: res.data,
+          selectSizePrice: res.data.basicInfo.minPrice,
+          buyNumMax: res.data.basicInfo.stores,
+          buyNumber: (res.data.basicInfo.stores > 0) ? 1 : 0,
+          selectptPrice: res.data.basicInfo.pingtuanPrice
         });
-        WxParse.wxParse('article', 'html', res.data.data.content, that, 5);
+        WxParse.wxParse('article', 'html', res.data.content, that, 5);
         that.goPingtuan();
         that.goPingList();
       }
     });
     this.reputation(that.data.id);
   },
+  //拼团
   goPingtuan: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/shop/goods/pingtuan/set',
+      url: app.globalData.urls + '/baby/shop/goods/pingtuan/set',
       data: {
         goodsId: that.data.goodsDetail.basicInfo.id,
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            pingtuan: res.data.data
+            pingtuan: res.data
           });
         }
       }
@@ -170,19 +168,19 @@ Page({
   goPingList: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/shop/goods/pingtuan/list',
+      url: app.globalData.urls + '/baby/shop/goods/pingtuan/list',
       data: {
         goodsId: that.data.goodsDetail.basicInfo.id,
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            pingList: res.data.data
+            pingList: res.data
           });
-          for (var i = 0; i < res.data.data.length; i++) {
-            if (res.data.data[i].uid == app.globalData.uid) {
+          for (var i = 0; i < res.data.length; i++) {
+            if (res.data[i].uid == app.globalData.uid) {
               that.setData({
-                ptuanCt: res.data.data[i].id
+                ptuanCt: res.data[i].id
               });
             }
           }
@@ -302,20 +300,19 @@ Page({
     // 计算当前价格
     if (canSubmit) {
       wx.request({
-        url: app.siteInfo.url + app.siteInfo.subDomain + '/shop/goods/price',
+        url: app.siteInfo.url + app.siteInfo.subDomain + '/baby/shop/goods/price',
         data: {
           goodsId: that.data.goodsDetail.basicInfo.id,
           propertyChildIds: propertyChildIds
         },
         success: function (res) {
-
           that.setData({
-            selectSizePrice: res.data.data.price,
+            selectSizePrice: res.data.price,
             propertyChildIds: propertyChildIds,
             propertyChildNames: propertyChildNames,
-            buyNumMax: res.data.data.stores,
-            buyNumber: (res.data.data.stores > 0) ? 1 : 0,
-            selectptPrice: res.data.data.pingtuanPrice
+            buyNumMax: res.data.stores,
+            buyNumber: (res.data.stores > 0) ? 1 : 0,
+            selectptPrice: res.data.pingtuanPrice
           });
         }
       })
@@ -325,7 +322,6 @@ Page({
       goodsDetail: that.data.goodsDetail,
       canSubmit: canSubmit
     })
-
   },
   /**
   * 加入购物车
@@ -589,18 +585,19 @@ Page({
       }
     }
   },
+  //评价
   reputation: function (goodsId) {
     var that = this;
     wx.request({
-      url: app.siteInfo.url + app.siteInfo.subDomain + '/shop/goods/reputation',
+      url: app.siteInfo.url + app.siteInfo.subDomain + '/baby/shop/goods/reputation',
       data: {
         goodsId: goodsId
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           //console.log(res.data.data);
           that.setData({
-            reputation: res.data.data
+            reputation: res.data
           });
         }
       }

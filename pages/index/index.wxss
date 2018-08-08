@@ -110,7 +110,8 @@
 
 .pingtuna-container {
   width: 100%;
-  border-bottom: 20rpx solid #f5f5f5;
+  float: left;
+  border-bottom:20rpx solid #f5f5f5;
 }
 
 .pingtuna-title {
@@ -349,10 +350,10 @@
 .goods-container {
   width: 100%;
   float: left;
-  margin-bottom: 20rpx;
+  border-bottom:20rpx solid #f5f5f5;
 }
 
-.goods-container .goods-title {
+.goods-title {
   text-align: center;
   height: 90rpx;
   line-height: 90rpx;
@@ -360,7 +361,7 @@
   font-size: 32rpx;
 }
 
-.goods-container .goods-title image {
+.goods-title image {
   width: 36rpx;
   height: 36rpx;
   margin-bottom: -6rpx;

@@ -60,14 +60,14 @@ Page({
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     //首页顶部Logo
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/baby/banner/list',
       data: {
         type: 'toplogo'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            toplogo: res.data.data[0].picUrl,
+            toplogo: res.data.picUrl,
             topname: wx.getStorageSync('mallName')
           });
         }
@@ -85,13 +85,13 @@ Page({
     })
     //获取砍价信息
     wx.request({
-      url: app.globalData.urls + '/shop/goods/kanjia/list',
+      url: app.globalData.urls + '/baby/shop/goods/kanjia/list',
       success: function (res) {
-        if (res.data.code == 0) {
-          for (var i = 0; i < res.data.data.result.length; i++) {
-            if (res.data.data.result[i].goodsId == e.id){
+        if (res.statusCode == 200) {
+          for (var i = 0; i < res.data.result.length; i++) {
+            if (res.data.result[i].goodsId == e.id){
               that.setData({
-                kanjiagoods: res.data.data.result[i]
+                kanjiagoods: res.data.result[i]
               });
             }
           }
@@ -100,34 +100,34 @@ Page({
     })
     //获取商品详情
     wx.request({
-      url: app.globalData.urls +'/shop/goods/detail',
+      url: app.globalData.urls +'/baby/shop/goods/detail',
       data: {
         id: e.id
       },
       success: function(res) {
         var selectSizeTemp = "";
-        if (res.data.data.properties) {
-          for(var i=0;i<res.data.data.properties.length;i++){
-            selectSizeTemp = selectSizeTemp + " " + res.data.data.properties[i].name;
+        if (res.data.properties) {
+          for(var i=0;i<res.data.properties.length;i++){
+            selectSizeTemp = selectSizeTemp + " " + res.data.properties[i].name;
           }
           that.setData({
             hasMoreSelect:true,
             selectSize:that.data.selectSize + selectSizeTemp,
-            selectSizePrice:res.data.data.basicInfo.minPrice,
+            selectSizePrice:res.data.basicInfo.minPrice,
           });
         }
-        that.data.goodsDetail = res.data.data;
-        if (res.data.data.basicInfo.videoId) {
-          that.getVideoSrc(res.data.data.basicInfo.videoId);
+        that.data.goodsDetail = res.data;
+        if (res.data.basicInfo.videoId) {
+          that.getVideoSrc(res.data.basicInfo.videoId);
         }
         that.setData({
-          goodsDetail:res.data.data,
-          selectSizePrice:res.data.data.basicInfo.minPrice,
-          buyNumMax:res.data.data.basicInfo.stores,
-          buyNumber:(res.data.data.basicInfo.stores>0) ? 1: 0
+          goodsDetail:res.data,
+          selectSizePrice:res.data.basicInfo.minPrice,
+          buyNumMax:res.data.basicInfo.stores,
+          buyNumber:(res.data.basicInfo.stores>0) ? 1: 0
         });
-        WxParse.wxParse('article', 'html', res.data.data.content, that, 5);
-        //this.getfav(res.data.data.goodsDetail.basicInfo.name)
+        WxParse.wxParse('article', 'html', res.data.content, that, 5);
+        //this.getfav(res.data.goodsDetail.basicInfo.name)
       }
     })
     this.reputation(e.id);
@@ -455,15 +455,15 @@ Page({
   reputation: function (goodsId) {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/shop/goods/reputation',
+      url: app.globalData.urls + '/baby/shop/goods/reputation',
       data: {
         goodsId: goodsId
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           //console.log(res.data.data);
           that.setData({
-            reputation: res.data.data
+            reputation: res.data
           });
         }
       }

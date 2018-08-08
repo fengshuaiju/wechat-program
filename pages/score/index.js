@@ -83,14 +83,13 @@ Page({
     })
     //获取签到规则
     wx.request({
-      url: app.globalData.urls + '/score/sign/rules',
+      url: app.globalData.urls + '/baby/score/sign/rules',
       data: {
       },
       success: function (res) {
-
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            rules: res.data.data
+            rules: res.data
           });
         }
       }

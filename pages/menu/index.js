@@ -1,4 +1,5 @@
 //index.js
+var util = require('../../utils/util.js')
 var app = getApp()
 Page({
   data: {
@@ -35,15 +36,15 @@ Page({
   search: function(e){
     var that = this
     wx.request({
-      url: app.globalData.urls + '/shop/goods/list',
+      url: app.globalData.urls + '/baby/shop/goods/list',
       data: {
         nameLike: e.detail.value
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           var searchs = [];
-          for (var i = 0; i < res.data.data.length; i++) {
-            searchs.push(res.data.data[i]);
+          for (var i = 0; i < res.data.length; i++) {
+            searchs.push(res.data[i]);
           }
           that.setData({
             searchs: searchs,
@@ -86,28 +87,28 @@ Page({
       }
     })
     wx.request({
-      url: app.globalData.urls + '/banner/list',
+      url: app.globalData.urls + '/baby/banner/list',
       data: {
         key: 'mallName',
         type: 'goods'
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            banners: res.data.data
+            banners: res.data
           });
         }
       }
     }),
     wx.request({
-      url: app.globalData.urls + '/shop/goods/category/all',
+      url: app.globalData.urls + '/baby/shop/goods/category/all',
       success: function (res) {
         var categories = [{ id: 0, name: "所有分类" }];
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           wx.hideLoading();
-          for (var i = 0; i < res.data.data.length; i++) {
-            if (res.data.data[i].level == 1) {
-              categories.push(res.data.data[i]);
+          for (var i = 0; i < res.data.length; i++) {
+            if (res.data[i].level == 1) {
+              categories.push(res.data[i]);
             }
           }
         }//
@@ -125,19 +126,19 @@ Page({
     }
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/shop/goods/category/all',
+      url: app.globalData.urls + '/baby/shop/goods/category/all',
       success: function (res) {
         var categorieslist = [];
-        if (res.data.code == 0) {
-          for (var i = 0; i < res.data.data.length; i++) {
+        if (res.statusCode == 200) {
+          for (var i = 0; i < res.data.length; i++) {
             if (categoryId != '') {
-              if (res.data.data[i].pid == categoryId) {
-                categorieslist.push(res.data.data[i]);
+              if (res.data[i].pid == categoryId) {
+                categorieslist.push(res.data[i]);
               }
             } else {
               //categorieslist.push(res.data.data[i]);
-              if (res.data.data[i].pid != 0) {
-                categorieslist.push(res.data.data[i]);
+              if (res.data[i].pid != 0) {
+                categorieslist.push(res.data[i]);
               }
             }
           }
@@ -150,7 +151,7 @@ Page({
   },
   toDetailsTap: function (e){
     wx.navigateTo({
-      url: "/pages/goods-details/index?id=" + e.currentTarget.dataset.id
+      url: "/baby/pages/goods-details/index?id=" + e.currentTarget.dataset.id
     })
     this.setData({
       search: true,
@@ -180,25 +181,9 @@ Page({
           })
         }
       }
-    })
-    wx.request({
-      url: app.globalData.urls + '/order/statistics',
-      data: { token: app.globalData.token },
-      success: function (res) {
-        if (res.data.code == 0) {
-          if (res.data.data.count_id_no_pay > 0) {
-            wx.setTabBarBadge({
-              index: 3,
-              text: '' + res.data.data.count_id_no_pay + ''
-            })
-          } else {
-            wx.removeTabBarBadge({
-              index: 3,
-            })
-          }
-        }
-      }
-    })
+    });
+
+    util.order();
   },
 
 })

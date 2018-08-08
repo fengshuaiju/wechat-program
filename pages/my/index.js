@@ -110,14 +110,14 @@ Page({
   getInfo: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/config/get-value',
+      url: app.globalData.urls + '/baby/open/config/get-value',
       data: {
         key: "mallinfo"
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            getInfo: res.data.data.value
+            getInfo: res.data.value
           });
         }
       }

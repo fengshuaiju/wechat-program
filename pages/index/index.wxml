@@ -1,8 +1,12 @@
 <!--index.wxml--> 
+<!-- 顶部图标 -->
 <view class="hidden {{navigationbar}} {{naviphone}}">
   <image src="{{toplogo}}" />
 </view>
+
 <view class="container">
+
+  <!--轮播图片开始-->
   <view class="swiper-container">
     <swiper class="swiper_box" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" bindchange="swiperchange" circular="circular">
       <block wx:for="{{banners}}" wx:key="id">
@@ -17,13 +21,36 @@
       </block>
     </view>
   </view>
+  <!--轮播图片结束-->
+
+  <!--签到、礼券、砍价、专栏 开始-->
   <view class="menu-container">
     <view class="menu-list" wx:for="{{sales}}" wx:key="id" bindtap="tapSales" data-id="{{item.linkUrl}}">
       <image src="{{item.picUrl}}" />
       <text>{{item.title}}</text>
     </view>
   </view>
+  <!--签到、礼券、砍价、专栏 结束-->
+
   <view class="home-hover" wx:if="{{banners}}"></view>
+
+   <!--人气推荐，开始-->
+  <view wx:if="{{topgoods}}" class="goods-container">
+    <view class="goods-title" bindtap="tapSales" data-id="{{topgoods.remark}}">
+      <text>{{topgoods.value}}</text>
+      <image src="../../images/home_more.png" />
+    </view>
+    <view class="goods-list" wx:for-items="{{goods}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.id}}">
+      <image src="{{item.pic}}" />
+      <view class="goods-list-title">{{item.name}}</view>
+      <view class="goods-list-text">{{item.characteristic}}</view>
+      <view class="goods-list-money">Ұ{{item.minPrice}}</view>
+    </view>
+  </view>
+  <!--人气推荐，结束-->
+
+
+  <!--中间隔条横线，拼团特惠-->
   <view wx:if="{{toptuan}}" class="pingtuna-container">
     <view class="pingtuna-title" bindtap="tapSales" data-id="{{toptuaninfo.remark}}">
       <text>{{toptuaninfo.value}}</text>
@@ -36,6 +63,9 @@
       <image src="{{item.picUrl}}" />
     </view>
   </view>
+  <!--拼团特惠结束-->
+
+  <!--全民砍价，开始-->
   <view wx:if="{{topkan}}" class="kanjia-container" wx:for="{{topkan}}" wx:key="id">
     <view class="kanjia-title" bindtap="tapSales" data-id="{{item.linkUrl}}">
       <text>{{item.title}}</text>
@@ -65,6 +95,9 @@
       </view>
     </view>
   </view>
+  <!--全民砍价，结束-->
+
+  <!--精选主题，开始-->
   <view wx:if="{{toptopic}}" class="topic-container" wx:for="{{toptopic}}" wx:key="id">
     <view class="topic-title" bindtap="tapSales" data-id="{{item.linkUrl}}">
       <text>{{item.title}}</text>
@@ -81,20 +114,14 @@
       </view>
     </scroll-view>
   </view>
-  <view wx:if="{{topgoods}}" class="goods-container">
-    <view class="goods-title" bindtap="tapSales" data-id="{{topgoods.remark}}">
-      <text>{{topgoods.value}}</text>
-      <image src="../../images/home_more.png" />
-    </view>
-    <view class="goods-list" wx:for-items="{{goods}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.id}}">
-      <image src="{{item.pic}}" />
-      <view class="goods-list-title">{{item.name}}</view>
-      <view class="goods-list-text">{{item.characteristic}}</view>
-      <view class="goods-list-money">Ұ{{item.minPrice}}</view>
-    </view>
-  </view>
+  <!--精选主题，结束-->
+
+ 
 </view>
+
+<!--新人红包-->
 <image class="newcoupons-hover" src="{{newcoupons.linkUrl}}" hidden="{{flag}}" bindtap="hoverNewcoupons" />
+<!--点开浮动红包窗口后的红包信息-->
 <view class="modal-box" hidden="{{hovercoupons}}" bindtap="hide">
   <view class="modal-body">
     <view class="modal-content">
@@ -103,6 +130,7 @@
     </view>
   </view>
 </view>
+
 <view class="show-container" hidden="{{wxlogin}}">
   <view class="show-box">
     <view class="show-logo-box">

@@ -1,5 +1,6 @@
 //index.js
 //获取应用实例
+var util = require('../../utils/util.js')
 var app = getApp()
 Page({
   data: {
@@ -150,24 +151,9 @@ Page({
         }
       }
     })
-    wx.request({
-      url: app.globalData.urls + '/order/statistics',
-      data: { token: app.globalData.token },
-      success: function (res) {
-        if (res.data.code == 0) {
-          if (res.data.data.count_id_no_pay > 0) {
-            wx.setTabBarBadge({
-              index: 3,
-              text: '' + res.data.data.count_id_no_pay + ''
-            })
-          } else {
-            wx.removeTabBarBadge({
-              index: 3,
-            })
-          }
-        }
-      }
-    })
+
+    util.order()
+
     setTimeout(function () {
       if (app.globalData.usinfo == 0) {
         that.setData({

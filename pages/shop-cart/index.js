@@ -1,5 +1,7 @@
 //index.js
 var app = getApp()
+var util = require('../../utils/util.js')
+
 Page({
   data: {
     goodsList: {
@@ -41,27 +43,27 @@ Page({
     var that = this;
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     wx.request({
-      url: app.globalData.urls + '/config/get-value',
+      url: app.globalData.urls + '/baby/open/config/get-value',
       data: {
         key: 'shopcart'
       },
       success: function (res) {
-        if (res.data.code == 0) {
-          var kb = res.data.data.value;
+        if (res.statusCode == 200) {
+          var kb = res.data.value;
           var kbarr = kb.split(',');
           that.setData({
-            sales: res.data.data
+            sales: res.data
           });
           var sales = [];
           for (var i = 0; i < kbarr.length; i++) {
             wx.request({
-              url: app.globalData.urls + '/shop/goods/detail',
+              url: app.globalData.urls + '/baby/shop/goods/detail',
               data: {
                 id: kbarr[i]
               },
               success: function (res) {
-                if (res.data.code == 0) {
-                  sales.push(res.data.data.basicInfo);
+                if (res.statusCode == 200) {
+                  sales.push(res.data.basicInfo);
                 }
                 that.setData({
                   sales: sales
@@ -100,24 +102,9 @@ Page({
         }
       }
     })
-    wx.request({
-      url: app.globalData.urls + '/order/statistics',
-      data: { token: app.globalData.token },
-      success: function (res) {
-        if (res.data.code == 0) {
-          if (res.data.data.count_id_no_pay > 0) {
-            wx.setTabBarBadge({
-              index: 3,
-              text: '' + res.data.data.count_id_no_pay + ''
-            })
-          } else {
-            wx.removeTabBarBadge({
-              index: 3,
-            })
-          }
-        }
-      }
-    })
+    
+    util.order()
+
     var shopList = [];
     // 获取购物车数据
     var shopCarInfoMem = wx.getStorageSync('shopCarInfo');
@@ -447,7 +434,5 @@ Page({
       url: "/pages/to-pay-order/index"
     })
   }
-
-
 
 })

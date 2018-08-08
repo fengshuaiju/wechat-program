@@ -11,16 +11,16 @@ Page({
     var that = this;
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     wx.request({
-      url: app.globalData.urls + '/shop/goods/kanjia/list',
+      url: app.globalData.urls + '/baby/shop/goods/kanjia/list',
       success: function (res) {
         var goodsid=[];
         var kanjialist=[];
-        if (res.data.code==0){
-        for (var i = 0; i < res.data.data.result.length; i++) {
-          goodsid.push(res.data.data.result[i].goodsId)
-          that.getgoods(res.data.data.result[i].goodsId)
+        if (res.statusCode == 200){
+        for (var i = 0; i < res.data.result.length; i++) {
+          goodsid.push(res.data.result[i].goodsId)
+          that.getgoods(res.data.result[i].goodsId)
         }
-        kanjialist = res.data.data.result
+        kanjialist = res.data.result
         }
         that.setData({
           kanjialist: kanjialist,
@@ -67,13 +67,13 @@ Page({
     var that=this
     var pics = that.data.pics
     wx.request({
-      url: app.globalData.urls + '/shop/goods/detail',
+      url: app.globalData.urls + '/baby/shop/goods/detail',
       data: {
         id: id
       },
       success: function (res) {
-        if (res.data.code==0) {
-          pics[id] = res.data.data.basicInfo
+        if (res.statusCode == 200) {
+          pics[id] = res.data.basicInfo
           that.setData({
             pics: pics,
           });
