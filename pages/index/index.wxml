@@ -11,7 +11,7 @@
     <swiper class="swiper_box" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" bindchange="swiperchange" circular="circular">
       <block wx:for="{{banners}}" wx:key="id">
         <swiper-item>
-          <image bindtap="tapBanner" data-id="{{item.businessId}}" src="{{item.picUrl}}_m" class="slide-image" />
+          <image bindtap="tapBanner" data-id="{{item.businessId}}" src="{{item.picUrl}}_m" class="slide-image"/>
         </swiper-item>
       </block>
     </swiper>
@@ -32,7 +32,7 @@
   </view>
   <!--签到、礼券、砍价、专栏 结束-->
 
-  <view class="home-hover" wx:if="{{banners}}"></view>
+  <view class="home-hover"></view>
 
    <!--人气推荐，开始-->
   <view wx:if="{{topgoods}}" class="goods-container">
@@ -125,7 +125,7 @@
 <view class="modal-box" hidden="{{hovercoupons}}" bindtap="hide">
   <view class="modal-body">
     <view class="modal-content">
-      <image src="{{newcoupons.picUrl}}" mode="widthFix" class="fenxiang" bindtap="newCoupon" data-id="{{newcoupons.businessId}}"></image>
+      <image src="{{newcoupons.picUrl}}" mode="widthFix" class="fenxiang" bindtap="newCoupon" data-id="{{newcoupons.couponId}}"></image>
       <image src="../../images/close.png" class="knowBtnImg" bindtap="hide"></image>
     </view>
   </view>

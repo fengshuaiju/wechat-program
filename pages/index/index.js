@@ -71,14 +71,17 @@ Page({
   //用户自主领取优惠券
   newCoupon: function (e) {
     var that = this;
+
+    console.log(e);
+
     wx.request({
-      url: app.globalData.urls + '/discounts/fetch',
+      url: app.globalData.urls + '/baby/discounts/fetch',
       data: {
-        id: e.currentTarget.dataset.id,//优惠券id
-        token: app.globalData.token
+        couponId: e.currentTarget.dataset.id,//优惠券id
+        openId: app.globalData.username
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           wx.showToast({
             title: '成功领取',
             icon: 'success',
@@ -170,10 +173,8 @@ Page({
     }
     //首页顶部Logo
     wx.request({
-      url: app.globalData.urls + '/baby/banner/list',
-      data: {
-        type: 'toplogo'
-      },
+      url: app.globalData.urls + '/baby/banner/top-logo',
+      data: {},
       success: function (res) {
         if (res.statusCode == 200) {
           that.setData({
@@ -185,10 +186,8 @@ Page({
     })
     //首页幻灯片
     wx.request({
-      url: app.globalData.urls + '/baby/banner/list',
-      data: {
-        type: 'home'
-      },
+      url: app.globalData.urls + '/baby/banner/slide-container',
+      data: {},
       success: function (res) {
         if (res.statusCode == 200) {
           that.setData({
@@ -199,11 +198,8 @@ Page({
     })
     //4个功能展示位
     wx.request({
-      url: app.globalData.urls + '/baby/banner/list',
-      data: {
-        key: 'mallName',
-        type: 'sale'
-      },
+      url: app.globalData.urls + '/baby/banner/function-menus',
+      data: {},
       success: function (res) {
         if (res.statusCode == 200) {
           that.setData({
@@ -352,38 +348,24 @@ Page({
 
     //新用户领取优惠券
     setTimeout(function () {
+      if (!app.globalData.username){
+          return;
+      }
       wx.request({
-        url: app.globalData.urls + '/baby/banner/list',
+        url: app.globalData.urls + '/baby/banner/newcoupons',
         data: {
-          key: 'mallName',
-          type: 'newcoupons'
+          openId: app.globalData.username
         },
         success: function (res) {
-
           if (res.statusCode == 200) {
+            if (res.data){
+              that.setData({ flag: false });
+              console.log(res.data);
+              that.setData({
+                newcoupons: res.data
+              });
+            }
 
-          //暂时把领取优惠券的窗口一直打开
-
-            // wx.request({//识别用户是否可以领取优惠券
-            //   //https://api.it120.cc/formatTime/discounts/fetch?id=2495&token=f3dc9820-d506-4f8a-9116-8609f64cb910&detect=true
-            //   url: app.globalData.urls + '/discounts/fetch',
-            //   data: {
-            //     id: res.data.data[0].businessId,//优惠券id
-            //     token: app.globalData.token,
-            //     detect: true
-            //   },
-            //   success: function (res) {
-            //     if (res.data.code == 0) {
-            //       that.setData({ flag: false })
-            //     }
-            //   }
-            // });
-
-            that.setData({ flag: false });
-
-            that.setData({
-              newcoupons: res.data
-            });
           }
         }
       })

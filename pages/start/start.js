@@ -49,15 +49,11 @@ Page({
     var that = this;
     countdown(that);
     wx.request({
-      url: app.globalData.urls + '/baby/banner/list',
-      data: {
-        key: 'mallName',
-        type: 'start'
-      },
+      url: app.globalData.urls + '/baby/open/config/starter',
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            sales: res.data.data
+            sales: res.data
           });
         }
       }

@@ -10,10 +10,7 @@ App({
       }
     });
     wx.request({
-      url: that.globalData.urls + "/baby/open/config/get-value",
-      data: {
-        key: "mallName"
-      },
+      url: that.globalData.urls + "/baby/open/config/mall-name",
       success: function (res) {
         if (res.statusCode == 200) {
           wx.setStorageSync("mallName", res.data.value);
@@ -21,37 +18,40 @@ App({
       }
     });
     wx.request({
-      url: that.globalData.urls + "/baby/score/send/rule",
+      url: that.globalData.urls + "/baby/open/config/send-score/rule",
       data: {
         code: "goodReputation"
       },
       success: function (res) {
         if (res.statusCode == 200) {
-          that.globalData.order_reputation_score = res.data[0].score;
+          that.globalData.order_reputation_score = res.data.score;
         }
       }
     });
     wx.request({
-      url: that.globalData.urls + "/baby/open/config/get-value",
-      data: {
-        key: "recharge_amount_min"
-      },
+      url: that.globalData.urls + "/baby/open/config/send-score/recharge-amount-min",
       success: function (res) {
         if (res.statusCode == 200) {
-          //that.globalData.recharge_amount_min = res.data.value;
-          that.globalData.recharge_amount_min = 0;
+          that.globalData.recharge_amount_min = res.data.value;
         }
       }
     });
-    wx.request({
-      url: that.globalData.urls + "/baby/shop/goods/kanjia/list",
-      data: {},
-      success: function (res) {
-        if (res.statusCode == 200) {
-          that.globalData.kanjiaList = res.data.result;
-        }
-      }
-    });
+
+
+
+    // wx.request({
+    //   url: that.globalData.urls + "/baby/open/config/send-score/kanjia",
+    //   data: {},
+    //   success: function (res) {
+    //     if (res.statusCode == 200) {
+    //       that.globalData.kanjiaList = res.data.result;
+    //     }
+    //   }
+    // });
+
+
+
+    
     that.login();
   },
   siteInfo: require("config.js"),
@@ -100,8 +100,8 @@ App({
                     password: 'N/A',
                     client_id: 'user'
                   },
-
                   success: function (res) {
+                    that.globalData.openId = res.data.openId;
                     that.globalData.token = res.data.access_token;
                     if (res.statusCode != 200) {
                       wx.hideLoading();
@@ -131,7 +131,7 @@ App({
       method: 'POST',
       url: that.globalData.urls + '/accounts/open/users/register',
       data: {
-        username: that.globalData.username
+        userName: that.globalData.username
       },
       // 设置请求的 参数
       success: (res) => {
