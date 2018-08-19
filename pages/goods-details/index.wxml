@@ -12,7 +12,7 @@
     <swiper class="swiper_box" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" bindchange="swiperchange">
       <block wx:for="{{goodsDetail.pics}}" wx:key="id">
         <swiper-item>
-          <image src="{{item.pic}}_m" class="slide-image" lazy-load="true" />
+          <image src="{{item.url}}_m" class="slide-image" lazy-load="true" />
         </swiper-item>
       </block>
     </swiper>
@@ -75,11 +75,11 @@
   <view class="ptuan-user-box" wx:if="{{goodsDetail.basicInfo.pingtuan == true && pingList}}">
     <view class="ptuan-user-title">参加以下网友的团，组团成功立即发货</view>
     <view class="ptuan-user-list" wx:for="{{pingList}}" wx:key="{{index}}" bindtap="addPingTuan" data-id="{{item.id}}" data-uid="{{item.uid}}">
-      <image src="{{item.apiExtUser.avatarUrl}}" />
+      <image src="{{item.avatarUrl}}" />
       <view class="ptuan-user-info-box">
         <view class="ptuan-user-name">
-          <text>{{item.apiExtUser.nick}}</text>
-          <text>还差{{pingtuan.numberPersion - item.helpNumber}}人成团</text>
+          <text>{{item.nick}}</text>
+          <text>还差{{item.numberLeft}}人成团</text>
         </view>
       </view>
       <view class="ptuan-user-btn">去参团></view>
@@ -178,7 +178,7 @@
     <view class="popup-contents">
       <view class="pop-goods-info">
         <view class="pop-img-box">
-          <image src="{{goodsDetail.basicInfo.pic}}" class="goods-thumbnail" />
+          <image src="{{goodsDetail.basicInfo.mainPic}}" class="goods-thumbnail" />
         </view>
         <view class="pop-goods-des">
           <view class="pop-goods-title">{{goodsDetail.basicInfo.name}}</view>

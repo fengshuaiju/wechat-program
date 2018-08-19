@@ -71,9 +71,6 @@ Page({
   //用户自主领取优惠券
   newCoupon: function (e) {
     var that = this;
-
-    console.log(e);
-
     wx.request({
       url: app.globalData.urls + '/baby/discounts/fetch',
       data: {
@@ -210,27 +207,15 @@ Page({
     })
     //获取拼团商品信息
     wx.request({
-      url: app.globalData.urls + '/baby/banner/list',
+      url: app.globalData.urls + '/baby/banner/toptuan',
       data: {
-        type: 'toptuan'
+        page: 0,
+        size: 10
       },
       success: function (res) {
         if (res.statusCode == 200) {
-          wx.request({
-            url: app.globalData.urls + '/baby/open/config/get-value',
-            data: {
-              key: 'toptuan',
-            },
-            success: function (res) {
-              if (res.statusCode == 200) {
-                that.setData({
-                  toptuaninfo: res.data
-                });
-              }
-            }
-          })
           that.setData({
-            toptuan: res.data
+            toptuan: res.data.content
           });
         }
       }
@@ -304,45 +289,33 @@ Page({
         }
       }
     })
+
     //获取推荐商品信息
     wx.request({
-      url: app.globalData.urls + '/baby/open/config/get-value',
+      url: app.globalData.urls + '/baby/banner/topgoods',
       data: {
-        key: 'topgoods'
+        page: 0,
+        size: 10
       },
       success: function (res) {
-        if (res.statusCode == 200) {
+        that.setData({
+          goods: [],
+          loadingMoreHidden: true
+        });
+        var goods = [];
+        if (res.statusCode != 200 || res.data.length == 0) {
           that.setData({
-            topgoods: res.data
+            loadingMoreHidden: false,
           });
-          wx.request({
-            url: app.globalData.urls + '/baby/shop/goods/list',
-            data: {
-              recommendStatus: 1,
-              pageSize: 10
-            },
-            success: function (res) {
-              that.setData({
-                goods: [],
-                loadingMoreHidden: true
-              });
-              var goods = [];
-              if (res.statusCode != 200 || res.data.length == 0) {
-                that.setData({
-                  loadingMoreHidden: false,
-                });
-                return;
-              }
-
-              for (var i = 0; i < res.data.length; i++) {
-                goods.push(res.data[i]);
-              }
-              that.setData({
-                goods: goods,
-              });
-            }
-          })
+          return;
         }
+
+        for (var i = 0; i < res.data.content.length; i++) {
+          goods.push(res.data.content[i]);
+        }
+        that.setData({
+          goods: goods,
+        });
       }
     })
 
@@ -360,7 +333,6 @@ Page({
           if (res.statusCode == 200) {
             if (res.data){
               that.setData({ flag: false });
-              console.log(res.data);
               that.setData({
                 newcoupons: res.data
               });

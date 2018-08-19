@@ -35,13 +35,13 @@
   <view class="home-hover"></view>
 
    <!--人气推荐，开始-->
-  <view wx:if="{{topgoods}}" class="goods-container">
-    <view class="goods-title" bindtap="tapSales" data-id="{{topgoods.remark}}">
-      <text>{{topgoods.value}}</text>
+  <view class="goods-container">
+    <view class="goods-title" bindtap="tapSales" data-id="topgoods">
+      <text>人气推荐</text>
       <image src="../../images/home_more.png" />
     </view>
-    <view class="goods-list" wx:for-items="{{goods}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.id}}">
-      <image src="{{item.pic}}" />
+    <view class="goods-list" wx:for-items="{{goods}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.goodsId}}">
+      <image src="{{item.mainPic}}" />
       <view class="goods-list-title">{{item.name}}</view>
       <view class="goods-list-text">{{item.characteristic}}</view>
       <view class="goods-list-money">Ұ{{item.minPrice}}</view>
@@ -51,16 +51,16 @@
 
 
   <!--中间隔条横线，拼团特惠-->
-  <view wx:if="{{toptuan}}" class="pingtuna-container">
-    <view class="pingtuna-title" bindtap="tapSales" data-id="{{toptuaninfo.remark}}">
-      <text>{{toptuaninfo.value}}</text>
+  <view class="pingtuna-container">
+    <view class="pingtuna-title" bindtap="tapSales" data-id="goodsId">
+      <text>拼团特惠</text>
       <image src="../../images/home_more.png" />
     </view>
     <view class="pingtuna-list" wx:for="{{toptuan}}" wx:key="id" bindtap="toDetailsTap" data-id="{{item.businessId}}">
-      <view class="pingtuna-list-title">{{item.title}}</view>
-      <view wx:if="{{item.linkUrl}}" class="pingtuna-list-text">{{item.linkUrl}}</view>
+      <view class="pingtuna-list-title">{{item.name}}</view>
+      <view wx:if="{{item.characteristic}}" class="pingtuna-list-text">{{item.characteristic}}</view>
       <view wx:if="{{item.remark}}" class="pingtuna-list-info">{{item.remark}}</view>
-      <image src="{{item.picUrl}}" />
+      <image src="{{item.mainPic}}"/> 
     </view>
   </view>
   <!--拼团特惠结束-->

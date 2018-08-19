@@ -87,12 +87,12 @@ Page({
       })
     }
 
+    //获取机型
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
+
+    //获取logo
     wx.request({
-      url: app.globalData.urls + '/baby/banner/list',
-      data: {
-        type: 'toplogo'
-      },
+      url: app.globalData.urls + '/baby/banner/top-logo',
       success: function (res) {
         if (res.statusCode == 200) {
           that.setData({
@@ -102,7 +102,10 @@ Page({
         }
       }
     })
+
+    //该商品是不是喜欢的商品
     this.getfav();
+
     // 获取购物车数据
     wx.getStorage({
       key: 'shopCarInfo',
@@ -113,6 +116,8 @@ Page({
         });
       }
     })
+
+    //商品详情
     wx.request({
       url: app.globalData.urls + '/baby/shop/goods/detail',
       data: {
@@ -141,20 +146,26 @@ Page({
           buyNumber: (res.data.basicInfo.stores > 0) ? 1 : 0,
           selectptPrice: res.data.basicInfo.pingtuanPrice
         });
-        WxParse.wxParse('article', 'html', res.data.content, that, 5);
-        that.goPingtuan();
-        that.goPingList();
+        WxParse.wxParse('article', 'html', res.data.basicInfo.content, that, 5);
+
+        //检测该商品是否支持拼团，若支持拼团获取拼团信息
+        if (res.data.basicInfo.pingtuan){
+          that.goPingtuan();
+          that.goPingList();
+        }
+ 
       }
     });
     this.reputation(that.data.id);
   },
-  //拼团
+
+  //拼团价格等信息
   goPingtuan: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/baby/shop/goods/pingtuan/set',
+      url: app.globalData.urls + '/baby/shop/goods/pingtuan/info',
       data: {
-        goodsId: that.data.goodsDetail.basicInfo.id,
+        goodsId: that.data.goodsDetail.basicInfo.goodsId
       },
       success: function (res) {
         if (res.statusCode == 200) {
@@ -165,12 +176,14 @@ Page({
       }
     })
   },
+
+  //已经拼团列表
   goPingList: function () {
     var that = this;
     wx.request({
       url: app.globalData.urls + '/baby/shop/goods/pingtuan/list',
       data: {
-        goodsId: that.data.goodsDetail.basicInfo.id,
+        goodsId: that.data.goodsDetail.basicInfo.goodsId,
       },
       success: function (res) {
         if (res.statusCode == 200) {
@@ -178,9 +191,9 @@ Page({
             pingList: res.data
           });
           for (var i = 0; i < res.data.length; i++) {
-            if (res.data[i].uid == app.globalData.uid) {
+            if (res.data[i].username == app.globalData.username) {
               that.setData({
-                ptuanCt: res.data[i].id
+                ptuanCt: res.data[i].goodsId
               });
             }
           }
@@ -229,7 +242,7 @@ Page({
         }
       }
     })
-
+ 
   },
   /**
    * 规格选择弹出框
@@ -603,25 +616,24 @@ Page({
       }
     })
   },
+
+  //检查该商品是否是喜欢的商品
   getfav: function () {
     //console.log(e)
     var that = this;
     var id = that.data.id
     wx.request({
-      url: app.globalData.urls + '/shop/goods/fav/list',
+      url: app.globalData.urls + '/baby/shop/goods/fav/check',
       data: {
-        //nameLike: this.data.goodsDetail.basicInfo.name,
-        token: app.globalData.token
+        goodsId: that.data.id,
+        token: app.globalData.username
       },
       success: function (res) {
-        if (res.data.code == 0 && res.data.data.length) {
-          for (var i = 0; i < res.data.data.length; i++) {
-            if (res.data.data[i].goodsId == parseInt(id)) {
-              that.setData({
+        if (res.statusCode == 200) {
+          if (res.data.fav){
+            that.setData({
                 favicon: 1
               });
-              break;
-            }
           }
         }
       }
@@ -717,8 +729,8 @@ Page({
   },
   onPullDownRefresh: function (e) {
     var that = this;
-    that.goPingtuan();
-    that.goPingList();
+    // that.goPingtuan();
+    // that.goPingList();
     wx.stopPullDownRefresh();
   },
   onShow: function () {
@@ -729,8 +741,8 @@ Page({
           wxlogin: false
         })
       }
-      that.goPingtuan();
-      that.goPingList();
+      // that.goPingtuan();
+      // that.goPingList();
     }, 1000)
   },
   userlogin: function (e) {
