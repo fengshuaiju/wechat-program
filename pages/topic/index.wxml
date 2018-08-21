@@ -19,9 +19,12 @@
         <view class="content-box">
           <template is="wxParse" data="{{wxParseData:article.nodes}}" />
         </view>
-        <view class="goods-box" wx:for="{{goods}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.id}}">
+
+        <view><text>同款推荐</text></view>
+        <!-- 同款推荐 -->
+        <view class="goods-box" wx:for="{{goods}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.goodsId}}">
           <view class="img-box">
-            <image src="{{item.pic}}_m" class="image" mode="widthFix" lazy-load="true" />
+            <image src="{{item.mainPic}}" class="image" mode="widthFix" lazy-load="true" />
             <view class="goods-characteristic">
               <text>{{item.characteristic}}</text>
             </view>

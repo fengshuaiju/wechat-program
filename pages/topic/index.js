@@ -15,42 +15,38 @@ Page({
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     var topictitle = that.data.topictitle;
     wx.request({
-      url: app.globalData.urls + '/baby/cms/news/detail',
+      url: app.globalData.urls + '/baby/cms/detail',
       data: {
-        id: e.id
+        cmsId: e.id
       },
       success: function (res) {
         if (res.statusCode == 200) {
-          var kb = res.data.keywords;
-          var kbarr = kb.split(',');
           that.setData({
             topics: res.data,
-            topictitle: res.data.title
+            topictitle: res.data.title,
+            topid: e.id
           });
-          var goods = [];
-          for (var i = 0; i < kbarr.length; i++) {
+          if(res.data.categoryId){
             wx.request({
-              url: app.globalData.urls + '/baby/shop/goods/detail',
+              url: app.globalData.urls + '/baby/shop/goods/similar/recommend',
               data: {
-                id: kbarr[i]
+                page: 0,
+                size: 4,
+                categoryId: res.data.categoryId
               },
               success: function (res) {
                 if (res.statusCode == 200) {
-                  goods.push(res.data.basicInfo);
+                    that.setData({
+                    goods: res.data.content,
+                  });
                 }
-                that.setData({
-                  goods: goods,
-                  topid: e.id
-                });
               }
             })
           }
           WxParse.wxParse('article', 'html', res.data.content, that, 5);
-          
         }
       }
     })
-
   },
   onShareAppMessage: function (e) {
     return {
@@ -64,6 +60,5 @@ Page({
       }
     }
   },
-
 
 })

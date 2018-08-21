@@ -121,7 +121,7 @@ Page({
     wx.request({
       url: app.globalData.urls + '/baby/shop/goods/detail',
       data: {
-        id: that.data.id
+        goodsId: that.data.id
       },
       success: function (res) {
         var selectSizeTemp = "";

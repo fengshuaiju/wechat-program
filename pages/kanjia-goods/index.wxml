@@ -12,7 +12,7 @@
     <swiper class="swiper_box" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" bindchange="swiperchange">
       <block wx:for="{{goodsDetail.pics}}" wx:key="id">
         <swiper-item>
-          <image src="{{item.pic}}_m" class="slide-image" lazy-load="true" />
+          <image src="{{item.url}}" class="slide-image" lazy-load="true" />
         </swiper-item>
       </block>
     </swiper>
@@ -30,11 +30,11 @@
       <view class="goods-title">{{goodsDetail.basicInfo.name}}</view>
       <view class="goods-characteristic">{{goodsDetail.basicInfo.characteristic}}</view>
       <view class="goods-price">
-        <text>底价</text>Ұ{{kanjiagoods.minPrice}}</view>
+        <text>底价</text>Ұ{{goodsDetail.basicInfo.minPrice}}</view>
       <view class="goods-originalPrice">
-        <text>原价</text>Ұ{{kanjiagoods.originalPrice}}</view>
+        <text>原价</text>Ұ{{goodsDetail.basicInfo.originalPrice}}</view>
       <view class="piangjia">
-        库存 {{kanjiagoods.number}}
+        库存 {{goodsDetail.basicInfo.stores}}
       </view>
     </view>
   </view>
@@ -75,9 +75,11 @@
       <button open-type="share"></button>
     </image>
   </view>
-  <view class="footer-box" wx:if="{{curGoodsKanjia}}" bindtap="goKanjia">
-    立即发起砍价，最低可砍到 {{kanjiagoods.minPrice}} 元
+
+  <view class="footer-box" bindtap="goKanjia">
+    立即发起砍价，最低可砍到 {{goodsDetail.basicInfo.minPrice}} 元
   </view>
+
 </view>
 
 <view class="show-container" hidden="{{wxlogin}}">

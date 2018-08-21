@@ -222,70 +222,26 @@ Page({
     })
     //获取砍价商品信息
     wx.request({
-      url: app.globalData.urls + '/baby/banner/list',
-      data: {
-        key: 'mallName',
-        type: 'topkan'
-      },
+      url: app.globalData.urls + '/baby/banner/cutdown',
+      data: {},
       success: function (res) {
         if (res.statusCode == 200) {
-          var kb = res.data[0].remark;
-          var kbarr = kb.split(',');
           that.setData({
-            topkan: res.data
+            topkans: res.data.content
           });
-          var topkans = [];
-          for (var i = 0; i < kbarr.length; i++) {
-            wx.request({
-              url: app.globalData.urls + '/baby/shop/goods/detail',
-              data: {
-                id: kbarr[i]
-              },
-              success: function (res) {
-                if (res.statusCode == 200) {
-                  topkans.push(res.data.basicInfo);
-                }
-                that.setData({
-                  topkans: topkans
-                });
-              }
-            })
-            that.getkangoods(kbarr[i])
-          }
         }
       }
     })
+
     //获取精选专题信息
     wx.request({
-      url: app.globalData.urls + '/baby/banner/list',
-      data: {
-        key: 'mallName',
-        type: 'toptopic'
-      },
+      url: app.globalData.urls + '/baby/banner/toptopic',
+      data: {},
       success: function (res) {
         if (res.statusCode == 200) {
-          var kb = res.data[0].remark;
-          var kbarr = kb.split(',');
           that.setData({
-            toptopic: res.data
+            toptopics: res.data.content
           });
-          var toptopics = [];
-          for (var i = 0; i < kbarr.length; i++) {
-            wx.request({
-              url: app.globalData.urls + '/baby/cms/news/detail',
-              data: {
-                id: kbarr[i]
-              },
-              success: function (res) {
-                if (res.statusCode == 200) {
-                  toptopics.push(res.data);
-                }
-                that.setData({
-                  toptopics: toptopics
-                });
-              }
-            })
-          }
         }
       }
     })

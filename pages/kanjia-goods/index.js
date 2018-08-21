@@ -18,6 +18,7 @@ Page({
     buyNumMin:1,
     buyNumMax:0,
     favicon:0,
+    curGoodsId:'',
     propertyChildIds:"",
     propertyChildNames:"",
     canSubmit:false, //  选中规格尺寸时候是否允许加入购物车
@@ -48,6 +49,7 @@ Page({
       }
     }, 1000)
   },
+
   onLoad: function (e) {
     if (e.inviter_id) {
       wx.setStorage({
@@ -60,10 +62,8 @@ Page({
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     //首页顶部Logo
     wx.request({
-      url: app.globalData.urls + '/baby/banner/list',
-      data: {
-        type: 'toplogo'
-      },
+      url: app.globalData.urls + '/baby/banner/top-logo',
+      data: {},
       success: function (res) {
         if (res.statusCode == 200) {
           that.setData({
@@ -83,56 +83,28 @@ Page({
         });
       } 
     })
-    //获取砍价信息
-    wx.request({
-      url: app.globalData.urls + '/baby/shop/goods/kanjia/list',
-      success: function (res) {
-        if (res.statusCode == 200) {
-          for (var i = 0; i < res.data.result.length; i++) {
-            if (res.data.result[i].goodsId == e.id){
-              that.setData({
-                kanjiagoods: res.data.result[i]
-              });
-            }
-          }
-        }
-      }
-    })
+    
     //获取商品详情
     wx.request({
       url: app.globalData.urls +'/baby/shop/goods/detail',
       data: {
-        id: e.id
+        goodsId: e.id
       },
       success: function(res) {
-        var selectSizeTemp = "";
-        if (res.data.properties) {
-          for(var i=0;i<res.data.properties.length;i++){
-            selectSizeTemp = selectSizeTemp + " " + res.data.properties[i].name;
-          }
-          that.setData({
-            hasMoreSelect:true,
-            selectSize:that.data.selectSize + selectSizeTemp,
-            selectSizePrice:res.data.basicInfo.minPrice,
-          });
-        }
-        that.data.goodsDetail = res.data;
-        if (res.data.basicInfo.videoId) {
-          that.getVideoSrc(res.data.basicInfo.videoId);
-        }
         that.setData({
           goodsDetail:res.data,
           selectSizePrice:res.data.basicInfo.minPrice,
           buyNumMax:res.data.basicInfo.stores,
-          buyNumber:(res.data.basicInfo.stores>0) ? 1: 0
+          buyNumber:(res.data.basicInfo.stores>0) ? 1: 0,
+          curGoodsId: e.id
         });
-        WxParse.wxParse('article', 'html', res.data.content, that, 5);
+        WxParse.wxParse('article', 'html', res.data.basicInfo.content, that, 5);
         //this.getfav(res.data.goodsDetail.basicInfo.name)
       }
     })
     this.reputation(e.id);
-    this.getKanjiaInfo(e.id);
   },
+
   goShopCar: function () {
     wx.reLaunch({
       url: "/pages/shop-cart/index"
@@ -490,36 +462,17 @@ Page({
       url: "/pages/index/index"
     })
   },
-  getKanjiaInfo: function (gid) {
-    var that = this;
-    if (!app.globalData.kanjiaList || app.globalData.kanjiaList.length == 0) {
-      that.setData({
-        curGoodsKanjia: undefined
-      });
-      return;
-    }
-    let curGoodsKanjia = app.globalData.kanjiaList.find(ele => {
-      return ele.goodsId == gid
-    });
-    if (curGoodsKanjia) {
-      that.setData({
-        curGoodsKanjia: curGoodsKanjia
-      });
-    } else {
-      that.setData({
-        curGoodsKanjia: undefined
-      });
-    }
-  },
+
   goKanjia: function () {
+    console.log("---------------------------")
     var that = this;
-    if (!that.data.curGoodsKanjia) {
+    if (!that.data.curGoodsId) {
       return;
     }
     wx.request({
       url: app.globalData.urls + '/shop/goods/kanjia/join',
       data: {
-        kjid: that.data.curGoodsKanjia.id,
+        kjid: that.data.curGoodsId,
         token: app.globalData.token
       },
       success: function (res) {
