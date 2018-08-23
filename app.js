@@ -37,8 +37,6 @@ App({
       }
     });
 
-
-
     // wx.request({
     //   url: that.globalData.urls + "/baby/open/config/send-score/kanjia",
     //   data: {},
@@ -48,13 +46,11 @@ App({
     //     }
     //   }
     // });
-
-
-
     
     that.login();
   },
   siteInfo: require("config.js"),
+  
   login: function () {
     var that = this;
     var token = that.globalData.token;
@@ -118,7 +114,6 @@ App({
                 that.registerUser();
               }
             }
-            // that.globalData.usinfo = 0;
           }
         });
       }

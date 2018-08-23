@@ -4,13 +4,19 @@ var app = getApp();
 
 Page({
   data: {
-    id: null,//商品id
+    goodsId: null,//商品id
+    cutDownId: null,
     share: 0,
     userID: 0,
     autoplay: true,
     interval: 3000,
     duration: 1000,
     goodsDetail: {},
+    cutdownInfo: {},
+    cutdownHelpers: {},
+    currentPrice: 0,//当前价格
+    cutTotalAmount: 0,//已经砍掉的价格
+    helperNumber:0,//已经有多少名好友帮忙砍价
     swiperCurrent: 0,
     wxlogin: true,
     kanjiashare: true,//发起砍价 or 邀请好友砍价弹窗
@@ -86,78 +92,168 @@ Page({
       postershow: true,
     })
   },
-  userlogin: function (e) {
+
+  // userlogin: function (e) {
+  //   var that = this;
+  //   var iv = e.detail.iv;
+  //   var encryptedData = e.detail.encryptedData;
+  //   wx.login({
+  //     success: function (wxs) {
+  //       wx.request({
+  //         url: app.globalData.urls + '/user/wxapp/register/complex',
+  //         data: {
+  //           code: wxs.code,
+  //           encryptedData: encryptedData,
+  //           iv: iv
+  //         },
+  //         success: function (res) {
+  //           if (res.data.code != 0) {
+  //             wx.showModal({
+  //               title: '温馨提示',
+  //               content: '需要您的授权，才能正常使用哦～',
+  //               showCancel: false,
+  //               success: function (res) { }
+  //             })
+  //           } else {
+  //             that.setData({ wxlogin: true })
+  //             app.login();
+  //             wx.showToast({
+  //               title: '授权成功',
+  //               duration: 2000
+  //             })
+  //             app.globalData.usinfo = 1;
+  //           }
+  //         }
+  //       })
+  //     }
+  //   })
+  // },
+
+  login: function () {
     var that = this;
-    var iv = e.detail.iv;
-    var encryptedData = e.detail.encryptedData;
+    var token = that.globalData.token;
+    if (token) {
+      wx.request({
+        url: that.globalData.urls + "/baby/user/check-token",
+        data: {
+          token: token
+        },
+        success: function (res) {
+          if (res.data.code != 0) {
+            that.globalData.token = null;
+            that.login();
+          }
+        }
+      });
+      return;
+    }
     wx.login({
-      success: function (wxs) {
+      success: function (res) {
+        //微信登录接口返回的code作为参数换取用户的openid
         wx.request({
-          url: app.globalData.urls + '/user/wxapp/register/complex',
+          url: that.globalData.urls + "/accounts/open/users/code2openId",
           data: {
-            code: wxs.code,
-            encryptedData: encryptedData,
-            iv: iv
+            code: res.code
           },
           success: function (res) {
-            if (res.data.code != 0) {
-              wx.showModal({
-                title: '温馨提示',
-                content: '需要您的授权，才能正常使用哦～',
-                showCancel: false,
-                success: function (res) { }
-              })
-            } else {
-              that.setData({ wxlogin: true })
-              app.login();
-              wx.showToast({
-                title: '授权成功',
-                duration: 2000
-              })
-              app.globalData.usinfo = 1;
+            that.globalData.username = res.data.openId;
+            //根据返回的code判断是否成功且该用户是否已注册
+            if (res.data.code == 0) {
+              //成功获取到openId,检测是否已经注册过
+              if (res.data.existence) {
+                wx.request({
+                  url: that.globalData.urls + '/accounts/oauth/token',//请求后端向微信交换openid用的接口
+                  method: 'POST',
+                  header: {
+                    'content-type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Basic dXNlcjpzZWNyZXQ='
+                  },
+                  data: {
+                    username: res.data.openId,
+                    grant_type: 'password',
+                    password: 'N/A',
+                    client_id: 'user'
+                  },
+                  success: function (res) {
+                    that.globalData.openId = res.data.openId;
+                    that.globalData.token = res.data.access_token;
+                    if (res.statusCode != 200) {
+                      wx.hideLoading();
+                      wx.showModal({
+                        title: "提示",
+                        content: "无法登录，请重试",
+                        showCancel: false
+                      });
+                      return;
+                    } else {
+                      that.setData({ wxlogin: true })
+                    }
+                  }
+                })
+              } else {//如果不存在就去注册
+                that.registerUser();
+              }
             }
           }
-        })
+        });
+      }
+    });
+  },
+
+  registerUser: function () {
+    var that = this;
+    wx.request({
+      method: 'POST',
+      url: that.globalData.urls + '/accounts/open/users/register',
+      data: {
+        userName: that.globalData.username
+      },
+      // 设置请求的 参数
+      success: (res) => {
+        wx.hideLoading();
+        that.login();
       }
     })
   },
+
   onShow: function () {
     var that = this;
     setTimeout(function () {
-      if (app.globalData.usinfo == 0) {
+      if (!app.globalData.username) {
         that.setData({
           wxlogin: false
         })
       }
     }, 1000)
   },
+
   onLoad: function (e) {
     var that = this;
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     var timestamp = Date.parse(new Date()) / 1000;
     //判断用户是否登录
     setTimeout(function () {
-      if (app.globalData.usinfo == 0) {
+      if (!app.globalData.username) {
         that.setData({
           wxlogin: false
         })
       }
     }, 1000)
+
     //首页顶部Logo
     wx.request({
-      url: app.globalData.urls + '/banner/list',
-      data: {
-        type: 'toplogo'
-      },
+      url: app.globalData.urls + '/baby/banner/top-logo',
+      data: {},
       success: function (res) {
-        if (res.data.code == 0 && app.globalData.system != 'key') {
+        if (res.statusCode == 200) {
           that.setData({
-            toplogo: res.data.data[0].picUrl,
+            toplogo: res.data.picUrl,
             topname: wx.getStorageSync('mallName')
           });
         }
       }
     })
+
     if (!e.id) { //扫码进入
       var scene = decodeURIComponent(e.scene);
       if (scene.length > 0 && scene != undefined) {
@@ -171,8 +267,8 @@ Page({
           for (var j = 0; j < dilist.length; j++) {
             dict[dilist[j][0]] = dilist[j][1]
           }
-          that.data.id = dict.i;
-          that.data.kjId = dict.k;
+          that.data.goodsId = dict.i;
+          that.data.cutDownId = dict.k;
           that.data.joiner = dict.j;
           that.data.share = dict.s;
         }
@@ -186,9 +282,11 @@ Page({
         )
       }
     }
-    if (!e.scene) { //链接进入
-      that.data.id = e.id;
-      that.data.kjId = e.kjId;
+
+    //链接进入
+    if (!e.scene) {
+      that.data.goodsId = e.goodsId;
+      that.data.cutDownId = e.cutDownId;
       that.data.joiner = e.joiner;
       that.data.share = e.share;
       if (e.share == 1) {
@@ -200,128 +298,151 @@ Page({
         )
       }
     }
+
+    //获取被砍商品的基本信息，原价、剩余时间、已经砍掉多少等
     wx.request({
-      url: app.globalData.urls + '/shop/goods/kanjia/list',
+      url: app.globalData.urls + '/baby/cutdown/info',
+      data: {
+        cutDownId: that.data.cutDownId
+      },
       success: function (res) {
-        for (var i = 0; i < res.data.data.result.length; i++) {
-          if (res.data.data.result[i].goodsId == that.data.id) {
-            that.setData({
-              //EndTime: res.data.data.result[i].dateEnd,
-              OriPrice: res.data.data.result[i].originalPrice,
-            });
-            var enddate = res.data.data.result[i].dateEnd;
-            enddate = enddate.replace(/-/g, '/');
-            var times = Date.parse(new Date(enddate)) / 1000;
-            var ptime = times - timestamp;
+        if (res.statusCode == 200) {
+          that.setData({
+            cutdownInfo: res.data,
+            currentPrice: res.data.currentPrice,
+            cutTotalAmount: res.data.cutTotalAmount,
+            helperNumber: res.data.helperNumber
+          });
+          var ptime = res.data.leftSecond;
             var interval = setInterval(function () {
-              var second = ptime;
-              var day = Math.floor(second / 3600 / 24);
-              var dayStr = day.toString();
-              if (dayStr.length == 1) dayStr = '0' + dayStr;
-              var hr = Math.floor((second - day * 3600 * 24) / 3600);
-              var hrStr = hr.toString();
-              if (hrStr.length == 1) hrStr = '0' + hrStr;
-              var min = Math.floor((second - day * 3600 * 24 - hr * 3600) / 60);
-              var minStr = min.toString();
-              if (minStr.length == 1) minStr = '0' + minStr;
-              var sec = second - day * 3600 * 24 - hr * 3600 - min * 60;
-              var secStr = sec.toString();
-              if (secStr.length == 1) secStr = '0' + secStr;
+            var second = ptime;
+            var day = Math.floor(second / 3600 / 24);
+            var dayStr = day.toString();
+            if (dayStr.length == 1) dayStr = '0' + dayStr;
+            var hr = Math.floor((second - day * 3600 * 24) / 3600);
+            var hrStr = hr.toString();
+            if (hrStr.length == 1) hrStr = '0' + hrStr;
+            var min = Math.floor((second - day * 3600 * 24 - hr * 3600) / 60);
+            var minStr = min.toString();
+            if (minStr.length == 1) minStr = '0' + minStr;
+            var sec = second - day * 3600 * 24 - hr * 3600 - min * 60;
+            var secStr = sec.toString();
+            if (secStr.length == 1) secStr = '0' + secStr;
+            that.setData({
+              countDownDay: dayStr,
+              countDownHour: hrStr,
+              countDownMinute: minStr,
+              countDownSecond: secStr,
+            });
+            ptime--;
+            if (ptime < 0) {
+              clearInterval(interval);
               that.setData({
-                countDownDay: dayStr,
-                countDownHour: hrStr,
-                countDownMinute: minStr,
-                countDownSecond: secStr,
-              });
-              ptime--;
-              if (ptime < 0) {
-                clearInterval(interval);
-                that.setData({
-                  countDownDay: '00',
-                  countDownHour: '00',
-                  countDownMinute: '00',
-                  countDownSecond: '00',
-                });
-              }
-            }.bind(that), 1000);
-          }
-        }
-      }
-    })
-    wx.request({
-      url: app.globalData.urls + '/shop/goods/detail',
-      data: {
-        id: that.data.id
-      },
-      success: function (res) {
-        that.setData({
-          goodsDetail: res.data.data,
-        });
-      }
-    })
-    wx.request({
-      url: app.globalData.urls + '/qrcode/wxa/unlimit',
-      data: {
-        scene: "k=" + that.data.kjId + ",j=" + that.data.joiner + ",i=" + that.data.id + ",s=1",
-        page: "pages/kanjia/index"
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          wx.downloadFile({
-            url: res.data.data,
-            success: function (res) {
-              that.setData({
-                codeimg: res.tempFilePath
+                countDownDay: '00',
+                countDownHour: '00',
+                countDownMinute: '00',
+                countDownSecond: '00',
               });
             }
-          })
+          }.bind(that), 1000);
         }
       }
     })
-    setTimeout(function () {//延迟执行，否则会获取不到正确的砍价金额
-      that.setData({ userID: app.globalData.uid });//用户ID
-      that.getKanjiaInfo(that.data.kjId, that.data.joiner);
-      that.getKanjiaInfoMyHelp(that.data.kjId, that.data.joiner);
-    }, 300)
+
+    // //生成二维码
+    // wx.request({
+    //   url: app.globalData.urls + '/qrcode/wxa/unlimit',
+    //   data: {
+    //     scene: "k=" + that.data.cutDownId + ",j=" + that.data.joiner + ",i=" + that.data.goodsId + ",s=1",
+    //     page: "pages/kanjia/index"
+    //   },
+    //   success: function (res) {
+    //     if (res.data.code == 0) {
+    //       wx.downloadFile({
+    //         url: res.data.data,
+    //         success: function (res) {
+    //           that.setData({
+    //             codeimg: res.tempFilePath
+    //           });
+    //         }
+    //       })
+    //     }
+    //   }
+    // })
+
+    //延迟执行，否则会获取不到正确的砍价金额
+    setTimeout(function () {
+      that.setData({ userID: app.globalData.username });//用户ID
+      that.getKanjiaHelper(that.data.cutDownId);
+      that.getKanjiaInfoMyHelp(that.data.cutDownId, that.data.joiner);
+    }, 100)
   },
+  // onLoad 结束。。。。。
+
   //下拉刷新砍价人数
   onPullDownRefresh: function () {
     var that = this;
-    var kjId = that.data.kjId;
+    var kjId = that.data.cutDownId;
     var joiner = that.data.joiner;
 
-    that.getKanjiaInfo(kjId, joiner);
+    that.getKanjiaHelper(kjId);
     wx.stopPullDownRefresh();
   },
+
+  //跳转商品砍价页面
   getgoods: function () {
     var that = this;
     wx.navigateTo({
-      url: "/pages/kanjia-goods/index?id=" + that.data.id
+      url: "/pages/kanjia-goods/index?id=" + that.data.goodsId
     })
   },
-  getkanjia: function () {
+
+  getkanjiaInfo: function(){
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/shop/goods/kanjia/join',
+      url: app.globalData.urls + '/baby/cutdown/info',
       data: {
-        kjid: that.data.kjId,
-        token: app.globalData.token
+        cutDownId: that.data.cutDownId
       },
       success: function (res) {
-        if (res.data.code == 0) {
-          wx.navigateTo({
-            url: "/pages/kanjia/index?kjId=" + res.data.data.kjId + "&joiner=" + res.data.data.uid + "&id=" + res.data.data.goodsId
-          })
-        } else {
-          wx.showModal({
-            title: '错误',
-            content: res.data.msg,
-            showCancel: false
-          })
+        if (res.statusCode == 200) {
+          that.setData({
+            cutdownInfo: res.data,
+            currentPrice: res.data.currentPrice,
+            cutTotalAmount: res.data.cutTotalAmount,
+            helperNumber: res.data.helperNumber
+          });
         }
       }
     })
   },
+
+
+  // getkanjia: function () {
+  //   var that = this;
+  //   wx.request({
+  //     url: app.globalData.urls + '/shop/goods/kanjia/join',
+  //     data: {
+  //       kjid: that.data.cutDownId,
+  //       token: app.globalData.token
+  //     },
+  //     success: function (res) {
+  //       if (res.data.code == 0) {
+  //         wx.navigateTo({
+  //           url: "/pages/kanjia/index?kjId=" + res.data.data.cutDownId + "&joiner=" + res.data.data.uid + "&id=" + res.data.data.goodsId
+  //         })
+  //       } else {
+  //         wx.showModal({
+  //           title: '错误',
+  //           content: 'dadadadadadadadad',
+  //           showCancel: false
+  //         })
+  //       }
+  //     }
+  //   })
+  // },
+
+  //分享小程序
   onShareAppMessage: function () {
     var that = this;
     that.setData({
@@ -329,7 +450,7 @@ Page({
     });
     return {
       title: "我发现一件好货，来帮我砍价吧～",
-      path: "/pages/kanjia/index?kjId=" + that.data.kjId + "&joiner=" + that.data.joiner + "&id=" + that.data.id + "&share=1",
+      path: "/pages/kanjia/index?kjId=" + that.data.cutDownId + "&joiner=" + that.data.joiner + "&id=" + that.data.goodsId + "&share=1",
       success: function (res) {
         // 转发成功
         that.setData({
@@ -341,107 +462,106 @@ Page({
       }
     }
   },
-  getKanjiaInfo: function (kjid, joiner) {
+
+  //获取参与砍价的人员
+  getKanjiaHelper: function (cutDownId) {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/shop/goods/kanjia/info',
+      url: app.globalData.urls + '/baby/cutdown/helpers',
       data: {
-        kjid: kjid,
-        joiner: joiner,
+        cutDownId: cutDownId
       },
       success: function (res) {
         var shareId = that.data.share;
-        if (res.data.code == 0 && app.globalData.system != 'key') {
+        if (res.statusCode == 200) {
           that.setData({
-            kjcurPrice: res.data.data.kanjiaInfo.curPrice
+            cutdownHelpers: res.data
           });
+
+          // if (res.data.data.kanjiaInfo.helpNumber == 0 && shareId != 1) {
+          //   setTimeout(function () {
+          //     that.setData({
+          //       kanjiashare: false
+          //     });
+          //   }, 800
+          //   )
+          // }
+
         }
-        if (res.data.data.kanjiaInfo.helpNumber == 0 && shareId != 1) {
-          setTimeout(function () {
-            that.setData({
-              kanjiashare: false
-            });
-          }, 800
-          )
-        }
-        if (res.data.code == 0) {   //
-          var getPrice = (res.data.data.kanjiaInfo.curPrice - res.data.data.kanjiaInfo.minPrice).toFixed(2) //计算还差结果保留2位小数
-          that.setData({
-            kanjiaInfo: res.data.data,
-            curPricese: res.data.data.kanjiaInfo.curPrice,
-            minPricese: res.data.data.kanjiaInfo.minPrice,
-            getPrice: getPrice
-          });
-          var onPrice = (that.data.OriPrice - that.data.curPricese).toFixed(2)  //计算已砍结果保留2位小数
-          that.setData({
-            onPrice: onPrice,
-          });
-        }
+
       }
     })
   },
-  getKanjiaInfoMyHelp: function (kjid, joiner) {
+
+  //获取我帮忙砍价的信息
+  getKanjiaInfoMyHelp: function (cutDownId, joiner) {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/shop/goods/kanjia/myHelp',
+      url: app.globalData.urls + '/baby/cutdown/my-help',
       data: {
-        kjid: kjid,
-        joinerUser: joiner,
-        token: app.globalData.token
+        cutDownId: cutDownId,
+        username: app.globalData.username
       },
       success: function (res) {
-        if (res.data.code == 0 && app.globalData.system != 'key') {
+        if (res.statusCode == 200) {
           that.setData({
-            kanjiaInfoMyHelp: res.data.data
+            kanjiaInfoMyHelp: res.data
           });
         }
       }
     })
   },
+
   helpKanjia: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/shop/goods/kanjia/help',
+      method: 'POST',
+      url: app.globalData.urls + '/baby/cutdown/help',
       data: {
-        kjid: that.data.kjId,
-        joinerUser: that.data.joiner,
-        token: app.globalData.token
+        cutDownId: that.data.cutDownId,
+        participant: app.globalData.username,
+        goodsId: that.data.goodsId
       },
       success: function (res) {
-        if (res.data.code != 0 && app.globalData.system != 'key') {
+        if (res.statusCode != 201) {
           wx.showModal({
             title: '错误',
-            content: res.data.msg,
+            content: '未能砍成功',
             showCancel: false
           })
           return;
         }
         that.setData({
-          mykanjiaInfo: res.data.data,
+          mykanjiaInfo: res.data,
           helpkanjiashare: true,
           victorykanjia: false
         });
-        that.getKanjiaInfo(that.data.kjId, that.data.joiner);
-        that.getKanjiaInfoMyHelp(that.data.kjId, that.data.joiner);
+        console.log("FFFFFFFFFFFFFFFFFFFFFFFFFFF");
+        that.getKanjiaHelper(that.data.cutDownId);
+        that.getKanjiaInfoMyHelp(that.data.cutDownId, that.data.joiner);
+        that.getkanjiaInfo();
       }
     })
   },
+
+  //支付
   gopay: function () {
-    var id = this.data.id;
+    var id = this.data.goodsId;
     var buykjInfo = this.buliduBuykjInfo();
     wx.setStorage({
       key: "buykjInfo",
       data: buykjInfo
     })
-
     wx.navigateTo({
       url: "/pages/to-pay-order/index?orderType=buykj"
     })
   },
+
+
   buliduBuykjInfo: function () {
     var shopCarMap = {};
     shopCarMap.goodsId = this.data.goodsDetail.basicInfo.id;
-    shopCarMap.kjid = this.data.kjId;
+    shopCarMap.kjid = this.data.cutDownId;
     shopCarMap.pic = this.data.goodsDetail.basicInfo.pic;
     shopCarMap.name = this.data.goodsDetail.basicInfo.name;
     shopCarMap.label = this.data.propertyChildNames;

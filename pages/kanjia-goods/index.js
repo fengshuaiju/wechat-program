@@ -278,7 +278,6 @@ Page({
       duration: 2000
     })
     //console.log(shopCarInfo);
-
     //shopCarInfo = {shopNum:12,shopList:[]}
   },
 	/**
@@ -412,10 +411,12 @@ Page({
     buyNowInfo.shopList.push(shopCarMap);
     return buyNowInfo;
   },   
+
+  //分享要被砍的商品
   onShareAppMessage: function () {
     return {
       title: this.data.goodsDetail.basicInfo.name,
-      path: '/pages/kanjia-goods/index?id=' + this.data.goodsDetail.basicInfo.id + '&share=1',
+      path: '/pages/kanjia-goods/index?id=' + this.data.goodsDetail.basicInfo.goodsId + '&share=1',
       success: function (res) {
         // 转发成功
       },
@@ -464,21 +465,22 @@ Page({
   },
 
   goKanjia: function () {
-    console.log("---------------------------")
     var that = this;
     if (!that.data.curGoodsId) {
       return;
     }
     wx.request({
-      url: app.globalData.urls + '/shop/goods/kanjia/join',
+      url: app.globalData.urls + '/baby/cutdown/create',
+      method: 'POST',
       data: {
-        kjid: that.data.curGoodsId,
-        token: app.globalData.token
+        goodsId: that.data.curGoodsId,
+        username: app.globalData.username
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 201) {
           wx.navigateTo({
-            url: "/pages/kanjia/index?kjId=" + res.data.data.kjId + "&joiner=" + res.data.data.uid + "&id=" + res.data.data.goodsId
+            //url: "/pages/kanjia/index?kjId=" + res.data.data.kjId + "&joiner=" + app.globalData.username + "&id=" + res.data.data.goodsId
+            url: "/pages/kanjia/index?cutDownId=" + res.data.cutDownId + "&joiner=" + app.globalData.username + "&goodsId=" + that.data.curGoodsId
           })
         } else {
           wx.showModal({
