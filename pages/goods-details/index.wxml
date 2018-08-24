@@ -36,10 +36,10 @@
             <text>{{goodsDetail.basicInfo.pingtuanPrice}}</text>
           </view>
           <view class="goods-ptuan-info">
-            <text class="txa">{{pingtuan.numberPersion}}人开团</text>
+            <text class="txa">{{pingtuan.numberRequire}}人开团</text>
             <text class="txb">原价 Ұ{{selectSizePrice}}</text>
           </view>
-          <view class="goods-right">已团{{pingtuan.numberSucccess}}件</view>
+          <view class="goods-right">已团{{pingtuan.numberSuccess}}件</view>
         </view>
       </block>
       <block wx:if="{{goodsDetail.basicInfo.pingtuan == false}}">

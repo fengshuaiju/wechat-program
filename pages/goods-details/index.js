@@ -150,8 +150,8 @@ Page({
 
         //检测该商品是否支持拼团，若支持拼团获取拼团信息
         if (res.data.basicInfo.pingtuan){
-          that.goPingtuan();
-          that.goPingList();
+          that.getPingtuaninfo();
+          that.getPingList();
         }
  
       }
@@ -160,10 +160,10 @@ Page({
   },
 
   //拼团价格等信息
-  goPingtuan: function () {
+  getPingtuaninfo: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/baby/shop/goods/pingtuan/info',
+      url: app.globalData.urls + '/baby/group-booking/info',
       data: {
         goodsId: that.data.goodsDetail.basicInfo.goodsId
       },
@@ -178,10 +178,10 @@ Page({
   },
 
   //已经拼团列表
-  goPingList: function () {
+  getPingList: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/baby/shop/goods/pingtuan/list',
+      url: app.globalData.urls + '/baby/group-booking/list',
       data: {
         goodsId: that.data.goodsDetail.basicInfo.goodsId,
       },
@@ -193,7 +193,7 @@ Page({
           for (var i = 0; i < res.data.length; i++) {
             if (res.data[i].username == app.globalData.username) {
               that.setData({
-                ptuanCt: res.data[i].goodsId
+                ptuanCt: true
               });
             }
           }
@@ -218,18 +218,21 @@ Page({
     });
     this.bindGuiGeTap();
   },
+
+  //一键开团
   pingtuan: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/shop/goods/pingtuan/open',
+      url: app.globalData.urls + '/baby/group-booking/open',
+      method: 'POST',
       data: {
-        token: app.globalData.token,
-        goodsId: that.data.goodsDetail.basicInfo.id
+        username: app.globalData.username,
+        goodsId: that.data.goodsDetail.basicInfo.goodsId
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 201) {
           that.setData({
-            pingtuanOpenId: res.data.data.id,
+            pingtuanOpenId: res.data.groupBookingId,
             shopType: "pingtuan"
           });
           that.bindGuiGeTap();
@@ -639,6 +642,8 @@ Page({
       }
     })
   },
+
+  //添加喜欢的商品
   fav: function () {
     var that = this;
     wx.request({
@@ -715,6 +720,7 @@ Page({
       tabArr: _obj
     });
   },
+  //去参团
   addPingTuan: function (e) {
     var id = e.currentTarget.dataset.id;
     var pid = e.currentTarget.dataset.uid;
@@ -722,15 +728,18 @@ Page({
       url: "/pages/pingtuan/index?id=" + id + "&uid=" + pid + "&gid=" + this.data.goodsDetail.basicInfo.id
     })
   },
+  //查看我发起的拼团详情
   goPingtuanTap: function () {
     wx.navigateTo({
-      url: "/pages/pingtuan/index?id=" + this.data.ptuanCt + "&uid=" + app.globalData.uid + "&gid=" + this.data.goodsDetail.basicInfo.id
+      url: "/pages/pingtuan/index?username=" + app.globalData.username + "&goodsId=" + this.data.goodsDetail.basicInfo.goodsId
+        + "&groupBookingId=" + this.data.goodsDetail.basicInfo.goodsId
+      // url: "/pages/pingtuan/index?id=" + this.data.ptuanCt + "&username=" + app.globalData.username + "&goodsId=" + this.data.goodsDetail.basicInfo.goodsId
     })
   },
   onPullDownRefresh: function (e) {
     var that = this;
-    // that.goPingtuan();
-    // that.goPingList();
+    // that.getPingtuaninfo();
+    // that.getPingList();
     wx.stopPullDownRefresh();
   },
   onShow: function () {
@@ -741,8 +750,8 @@ Page({
           wxlogin: false
         })
       }
-      // that.goPingtuan();
-      // that.goPingList();
+      // that.getPingtuaninfo();
+      // that.getPingList();
     }, 1000)
   },
   userlogin: function (e) {

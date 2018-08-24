@@ -54,7 +54,7 @@ Page({
             ptid: dict.i,
             ktid: dict.u,
             gdid: dict.g,
-            userId: app.globalData.uid
+            userId: app.globalData.username
           })
         }
       }
@@ -62,35 +62,33 @@ Page({
     if (!e.scene) { //链接进入
       var ptid = e.id;
       var ktid = e.uid;
-      var gdid = e.gid;
+      var goodsId = e.goodsId;
       that.setData({
         ptid: e.id,
         ktid: e.uid,
-        gdid: e.gid,
-        userId: app.globalData.uid
+        goodsId: e.goodsId,
+        userId: app.globalData.username
       })
     }
     if (e.share) { that.setData({ share: e.share }); }
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     //首页顶部Logo
     wx.request({
-      url: app.globalData.urls + '/banner/list',
-      data: {
-        type: 'toplogo'
-      },
+      url: app.globalData.urls + '/baby/banner/pingtuan',
+      data: {},
       success: function (res) {
         if (res.data.code == 0) {
           that.setData({
-            toplogo: res.data.data[0].picUrl,
+            toplogo: res.data.picUrl,
             topname: wx.getStorageSync('mallName')
           });
         }
       }
     })
     wx.request({
-      url: app.globalData.urls + '/shop/goods/detail',
+      url: app.globalData.urls + '/baby/shop/goods/detail',
       data: {
-        id: gdid
+        goodsId: goodsId
       },
       success: function (res) {
         var selectSizeTemp = "";
@@ -118,7 +116,7 @@ Page({
     wx.request({
       url: app.globalData.urls + '/qrcode/wxa/unlimit',
       data: {
-        scene: "i=" + that.data.ptid + ",u=" + that.data.ktid + ",g=" + that.data.gdid,
+        scene: "i=" + that.data.ptid + ",u=" + that.data.ktid + ",g=" + that.data.goodsId,
         page: "pages/pingtuan/index",
       },
       success: function (res) {
@@ -143,7 +141,7 @@ Page({
     wx.request({
       url: app.globalData.urls + '/shop/goods/pingtuan/set',
       data: {
-        goodsId: that.data.gdid
+        goodsId: that.data.goodsId
       },
       success: function (res) {
         if (res.data.code == 0) {
@@ -186,7 +184,7 @@ Page({
     wx.request({
       url: app.globalData.urls + '/shop/goods/pingtuan/list',
       data: {
-        goodsId: that.data.gdid
+        goodsId: that.data.goodsId
       },
       success: function (res) {
         if (res.data.code == 0) {
@@ -452,7 +450,7 @@ Page({
     })
     return {
       title: '快来和我一起拼：' + that.data.goodsDetail.basicInfo.name,
-      path: '/pages/pingtuan/index?id=' + that.data.ptid + '&uid=' + that.data.ktid + '&gid=' + that.data.gdid + '&share=1',
+      path: '/pages/pingtuan/index?id=' + that.data.ptid + '&uid=' + that.data.ktid + '&gid=' + that.data.goodsId + '&share=1',
       success: function (res) {
         // 转发成功
       },
@@ -500,9 +498,9 @@ Page({
     })
   },
   goodsTap: function () {
-    var gdid = this.data.gdid;
+    var goodsId = this.data.goodsId;
     wx.navigateTo({
-      url: "/pages/goods-details/index?id=" + gdid
+      url: "/pages/goods-details/index?id=" + goodsId
     })
   },
   onShow: function () {

@@ -289,6 +289,7 @@ Page({
       that.data.cutDownId = e.cutDownId;
       that.data.joiner = e.joiner;
       that.data.share = e.share;
+      that.data.kanjiashare = e.kanjiashare;
       if (e.share == 1) {
         setTimeout(function () {
           that.setData({
@@ -376,6 +377,9 @@ Page({
       that.getKanjiaHelper(that.data.cutDownId);
       that.getKanjiaInfoMyHelp(that.data.cutDownId, that.data.joiner);
     }, 100)
+    if ('true' == that.data.kanjiashare){
+      that.getshare();
+    }
   },
   // onLoad 结束。。。。。
 
@@ -384,8 +388,9 @@ Page({
     var that = this;
     var kjId = that.data.cutDownId;
     var joiner = that.data.joiner;
-
+    //刷新获取砍价人员列表 和 被砍货物的基本信息
     that.getKanjiaHelper(kjId);
+    that.getkanjiaInfo();
     wx.stopPullDownRefresh();
   },
 
@@ -417,30 +422,34 @@ Page({
     })
   },
 
-
-  // getkanjia: function () {
-  //   var that = this;
-  //   wx.request({
-  //     url: app.globalData.urls + '/shop/goods/kanjia/join',
-  //     data: {
-  //       kjid: that.data.cutDownId,
-  //       token: app.globalData.token
-  //     },
-  //     success: function (res) {
-  //       if (res.data.code == 0) {
-  //         wx.navigateTo({
-  //           url: "/pages/kanjia/index?kjId=" + res.data.data.cutDownId + "&joiner=" + res.data.data.uid + "&id=" + res.data.data.goodsId
-  //         })
-  //       } else {
-  //         wx.showModal({
-  //           title: '错误',
-  //           content: 'dadadadadadadadad',
-  //           showCancel: false
-  //         })
-  //       }
-  //     }
-  //   })
-  // },
+  //我也要砍价
+  getkanjia: function () {
+    var that = this;
+    //暂时先跳转到砍价页面，后续记录跳转时的用户信息等
+    wx.navigateTo({
+      url: "/pages/kanjia-goods/index?id=" + that.data.goodsId
+    })
+    // wx.request({
+    //   url: app.globalData.urls + '/shop/goods/kanjia/join',
+    //   data: {
+    //     kjid: that.data.cutDownId,
+    //     token: app.globalData.token
+    //   },
+    //   success: function (res) {
+    //     if (res.data.code == 0) {
+    //       wx.navigateTo({
+    //         url: "/pages/kanjia/index?kjId=" + res.data.data.cutDownId + "&joiner=" + res.data.data.uid + "&id=" + res.data.data.goodsId
+    //       })
+    //     } else {
+    //       wx.showModal({
+    //         title: '错误',
+    //         content: 'dadadadadadadadad',
+    //         showCancel: false
+    //       })
+    //     }
+    //   }
+    // })
+  },
 
   //分享小程序
   onShareAppMessage: function () {
@@ -536,7 +545,6 @@ Page({
           helpkanjiashare: true,
           victorykanjia: false
         });
-        console.log("FFFFFFFFFFFFFFFFFFFFFFFFFFF");
         that.getKanjiaHelper(that.data.cutDownId);
         that.getKanjiaInfoMyHelp(that.data.cutDownId, that.data.joiner);
         that.getkanjiaInfo();

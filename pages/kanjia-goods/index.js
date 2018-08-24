@@ -480,7 +480,7 @@ Page({
         if (res.statusCode == 201) {
           wx.navigateTo({
             //url: "/pages/kanjia/index?kjId=" + res.data.data.kjId + "&joiner=" + app.globalData.username + "&id=" + res.data.data.goodsId
-            url: "/pages/kanjia/index?cutDownId=" + res.data.cutDownId + "&joiner=" + app.globalData.username + "&goodsId=" + that.data.curGoodsId
+            url: "/pages/kanjia/index?cutDownId=" + res.data.cutDownId + "&joiner=" + app.globalData.username + "&goodsId=" + that.data.curGoodsId + "&kanjiashare=" + res.data.isNew
           })
         } else {
           wx.showModal({
