@@ -124,6 +124,9 @@ form {
 }
 
 .a-goods .text-box .arow .goods-label {
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  overflow:hidden;
   font-size: 26rpx;
   color: #999;
 }
@@ -131,6 +134,10 @@ form {
 .a-goods .text-box .arow .goods-num {
   font-size: 26rpx;
   color: #999;
+}
+
+.arow{
+  display:inline-block;
 }
 
 .peisong-way {

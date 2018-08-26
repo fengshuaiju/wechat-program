@@ -32,7 +32,8 @@ Page({
     },
     wxlogin: true,
     sharecode: true,
-    sharebox: true
+    sharebox: true,
+    stores: 0
   },
 
   //事件处理函数
@@ -144,7 +145,8 @@ Page({
           selectSizePrice: res.data.basicInfo.minPrice,
           buyNumMax: res.data.basicInfo.stores,
           buyNumber: (res.data.basicInfo.stores > 0) ? 1 : 0,
-          selectptPrice: res.data.basicInfo.pingtuanPrice
+          selectptPrice: res.data.basicInfo.pingtuanPrice,
+          stores: res.data.basicInfo.stores
         });
         WxParse.wxParse('article', 'html', res.data.basicInfo.content, that, 5);
 
@@ -219,9 +221,10 @@ Page({
     this.bindGuiGeTap();
   },
 
-  //一键开团
+  //一键开团，先存储开团信息，此时的开团信息为 INIT 成功开团后为 IN_PROGRESS 完成拼团后为 FINISHED
   pingtuan: function () {
     var that = this;
+
     wx.request({
       url: app.globalData.urls + '/baby/group-booking/open',
       method: 'POST',
@@ -281,6 +284,7 @@ Page({
       })
     }
   },
+
   /**
    * 选择商品规格
    * @param {Object} e
@@ -304,8 +308,8 @@ Page({
       for (var j = 0; j < childs.length; j++) {
         if (childs[j].active) {
           curSelectNum++;
-          propertyChildIds = propertyChildIds + that.data.goodsDetail.properties[i].id + ":" + childs[j].id + ",";
-          propertyChildNames = propertyChildNames + that.data.goodsDetail.properties[i].name + ":" + childs[j].name + "  ";
+          propertyChildIds = propertyChildIds + that.data.goodsDetail.properties[i].childsCurGoods[j].detailId + ":";
+          propertyChildNames = propertyChildNames + that.data.goodsDetail.properties[i].childsCurGoods[j].name + " ";
         }
       }
     }
@@ -313,22 +317,24 @@ Page({
     if (needSelectNum == curSelectNum) {
       canSubmit = true;
     }
+
     // 计算当前价格
     if (canSubmit) {
       wx.request({
         url: app.siteInfo.url + app.siteInfo.subDomain + '/baby/shop/goods/price',
         data: {
-          goodsId: that.data.goodsDetail.basicInfo.id,
-          propertyChildIds: propertyChildIds
+          goodsId: that.data.goodsDetail.basicInfo.goodsId,
+          propertyChildIds: propertyChildIds.substring(0, propertyChildIds.length-1),
+          shopType: that.data.shopType
         },
         success: function (res) {
           that.setData({
             selectSizePrice: res.data.price,
-            propertyChildIds: propertyChildIds,
+            propertyChildIds: propertyChildIds.substring(0, propertyChildIds.length-1),
             propertyChildNames: propertyChildNames,
-            buyNumMax: res.data.stores,
-            buyNumber: (res.data.stores > 0) ? 1 : 0,
-            selectptPrice: res.data.pingtuanPrice
+            buyNumMax: that.data.stores,
+            buyNumber: (that.data.stores > 0) ? 1 : 0,
+            selectptPrice: res.data.price
           });
         }
       })
@@ -437,7 +443,7 @@ Page({
 
   },
   /**
-	  * 一键开团
+	  * 购买开团商品
 	  */
   buyPingtuan: function () {
     var that = this;
@@ -496,7 +502,9 @@ Page({
     shopCarMap.name = this.data.goodsDetail.basicInfo.name;
     // shopCarMap.label=this.data.goodsDetail.basicInfo.id; 规格尺寸 
     shopCarMap.propertyChildIds = this.data.propertyChildIds;
+
     shopCarMap.label = this.data.propertyChildNames;
+    //价格
     shopCarMap.price = this.data.selectSizePrice;
     shopCarMap.left = "";
     shopCarMap.active = true;
@@ -559,22 +567,32 @@ Page({
     buyNowInfo.shopList.push(shopCarMap);
     return buyNowInfo;
   },
+
+  //构建拼团信息
   bulidupingTuanInfo: function () {
     var shopCarMap = {};
-    shopCarMap.goodsId = this.data.goodsDetail.basicInfo.id;
+    shopCarMap.goodsId = this.data.goodsDetail.basicInfo.goodsId;
+    //拼团ID
     shopCarMap.pingtuanId = this.data.pingtuanOpenId;
-    shopCarMap.pic = this.data.goodsDetail.basicInfo.pic;
+    //商品图片
+    shopCarMap.pic = this.data.goodsDetail.basicInfo.mainPic;
+    //商品名称
     shopCarMap.name = this.data.goodsDetail.basicInfo.name;
-    // shopCarMap.label=this.data.goodsDetail.basicInfo.id; 规格尺寸 
+    //商品规格组合ID
     shopCarMap.propertyChildIds = this.data.propertyChildIds;
+    //商品副信息
     shopCarMap.label = this.data.propertyChildNames;
+    //选中的商品价格
     shopCarMap.price = this.data.selectptPrice;
-    //this.data.goodsDetail.basicInfo.pingtuanPrice;
     shopCarMap.left = "";
     shopCarMap.active = true;
+    //要购买的件数
     shopCarMap.number = this.data.buyNumber;
+    //物流信息-----
     shopCarMap.logisticsType = this.data.goodsDetail.basicInfo.logisticsId;
+    //还是物流----
     shopCarMap.logistics = this.data.goodsDetail.logistics;
+    //商品重量----
     shopCarMap.weight = this.data.goodsDetail.basicInfo.weight;
 
     var buyNowInfo = {};
@@ -587,6 +605,8 @@ Page({
     buyNowInfo.shopList.push(shopCarMap);
     return buyNowInfo;
   },
+
+  //分享商品
   onShareAppMessage: function () {
     var that = this;
     that.setData({ sharebox: true })
@@ -601,6 +621,7 @@ Page({
       }
     }
   },
+
   //评价
   reputation: function (goodsId) {
     var that = this;
@@ -667,6 +688,7 @@ Page({
       }
     })
   },
+  // 取消喜欢的商品
   del: function () {
     var that = this;
     wx.request({
