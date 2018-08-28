@@ -71,6 +71,7 @@ Page({
       }
     })
   },
+  //关闭订单
   closeOreder: function () {
     wx.showModal({
       title: '',

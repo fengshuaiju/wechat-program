@@ -16,11 +16,14 @@ Page({
     hasNoCoupons: true,
     coupons: [],
     youhuijine: 0, //优惠券金额
-    curCoupon: null // 当前选择使用的优惠券
+    curCoupon: null, // 当前选择使用的优惠券
+
+    groupBookingId: null,
+    cutDownId: null,
+    ordersType: null //该type为创建订单用
   },
 
   onShow: function () {
-    // console.log(this.data.orderType)
     var that = this;
     var shopList = [];
     //砍价下单
@@ -30,6 +33,10 @@ Page({
         if (buykjInfoMem && buykjInfoMem.shopList) {
           shopList = buykjInfoMem.shopList
         }
+        that.setData({
+          cutDownId: buykjInfoMem.shopList[0].cutDownId, 
+          ordersType: 'CUT_DOWN'
+        });
       }
     }
     //拼团下单
@@ -39,9 +46,14 @@ Page({
         if (buyPTInfoMem && buyPTInfoMem.shopList) {
           shopList = buyPTInfoMem.shopList
         }
+        that.setData({
+          groupBookingId: buyPTInfoMem.shopList[0].pingtuanId,
+          ordersType: 'GROUP_BOOKING'
+        });
       }
     }
-    //立即购买下单
+
+    //立即购买下单 //TODO 此处可能要设置 砍价ID 后期进行设置
     else if ("buyNow" == that.data.orderType) {
       var buyNowInfoMem = wx.getStorageSync('buyNowInfo');
       if (buyNowInfoMem && buyNowInfoMem.shopList) {
@@ -64,8 +76,6 @@ Page({
   },
 
   onLoad: function (e) {
-    console.log("eeeeeeeeeeeeeee")
-    console.log(e)
     var that = this;
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     //显示收货地址标识
@@ -75,19 +85,8 @@ Page({
     });
   },
 
-  //获取地域信息ID
-  getDistrictId: function (obj, aaa) {
-    if (!obj) {
-      return "";
-    }
-    if (!aaa) {
-      return "";
-    }
-    return aaa;
-  },
-
   createOrder: function (e) {
-    
+
     wx.showLoading();
     var that = this;
     var loginToken = app.globalData.username // 用户登录 token
@@ -101,7 +100,10 @@ Page({
       goodsJsonStr: that.data.goodsJsonStr,
       remark: remark,
       couponId: "",
-      addressId: ""
+      addressId: "",
+      groupBookingId: that.data.groupBookingId,
+      cutDownId: that.data.cutDownId,
+      orderType: that.data.ordersType
     };
 
     //检测是否写了收货地址
@@ -132,7 +134,6 @@ Page({
     if (that.data.curCoupon) {
       postData.couponId = that.data.curCoupon.couponId;
     }
-    
     wx.request({
       url: app.globalData.urls + '/baby/order/create',
       method: 'POST',
@@ -239,14 +240,13 @@ Page({
       '{"goodsId":' + carShopBean.goodsId + 
       ',"number":' + carShopBean.number + 
       ',"propertyChildIds":"' + carShopBean.propertyChildIds + 
-      '", "inviterId":' + inviter_id + 
-      '", "groupBookingId":' + carShopBean.pingtuanId + 
-      '", "cutDownId":' + 0 //此处暂时先把砍价ID处理为0，写到砍价的时候应该进行修改
-      +'}';
+      '", "inviterId":"' + inviter_id +
+      '", "goodsLabel":"' + carShopBean.label
+      +'"}';
       goodsJsonStr += goodsJsonStrTmp;
     }
     goodsJsonStr += "]";
-
+    
     //设置数据
     that.setData({
       goodsJsonStr: goodsJsonStr,
@@ -282,7 +282,6 @@ Page({
         username: app.globalData.username
       },
       success: function (res) {
-        console.log(res.data);
         if (res.statusCode == 200) {
           // 过滤符合条件的红包，可以把过滤转到服务端做
           var coupons = res.data.filter(entity => {

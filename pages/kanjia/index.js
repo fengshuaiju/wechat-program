@@ -93,42 +93,6 @@ Page({
     })
   },
 
-  // userlogin: function (e) {
-  //   var that = this;
-  //   var iv = e.detail.iv;
-  //   var encryptedData = e.detail.encryptedData;
-  //   wx.login({
-  //     success: function (wxs) {
-  //       wx.request({
-  //         url: app.globalData.urls + '/user/wxapp/register/complex',
-  //         data: {
-  //           code: wxs.code,
-  //           encryptedData: encryptedData,
-  //           iv: iv
-  //         },
-  //         success: function (res) {
-  //           if (res.data.code != 0) {
-  //             wx.showModal({
-  //               title: '温馨提示',
-  //               content: '需要您的授权，才能正常使用哦～',
-  //               showCancel: false,
-  //               success: function (res) { }
-  //             })
-  //           } else {
-  //             that.setData({ wxlogin: true })
-  //             app.login();
-  //             wx.showToast({
-  //               title: '授权成功',
-  //               duration: 2000
-  //             })
-  //             app.globalData.usinfo = 1;
-  //           }
-  //         }
-  //       })
-  //     }
-  //   })
-  // },
-
   login: function () {
     var that = this;
     var token = that.globalData.token;
@@ -486,18 +450,7 @@ Page({
           that.setData({
             cutdownHelpers: res.data
           });
-
-          // if (res.data.data.kanjiaInfo.helpNumber == 0 && shareId != 1) {
-          //   setTimeout(function () {
-          //     that.setData({
-          //       kanjiashare: false
-          //     });
-          //   }, 800
-          //   )
-          // }
-
         }
-
       }
     })
   },
@@ -565,21 +518,32 @@ Page({
     })
   },
 
-
+  //构建砍价信息
   buliduBuykjInfo: function () {
+
     var shopCarMap = {};
-    shopCarMap.goodsId = this.data.goodsDetail.basicInfo.id;
-    shopCarMap.kjid = this.data.cutDownId;
-    shopCarMap.pic = this.data.goodsDetail.basicInfo.pic;
-    shopCarMap.name = this.data.goodsDetail.basicInfo.name;
-    shopCarMap.label = this.data.propertyChildNames;
-    shopCarMap.price = this.data.kanjiaInfo.kanjiaInfo.curPrice//this.data.selectSizePrice;
+    shopCarMap.goodsId = this.data.cutdownInfo.goodsId;
+    //砍价ID
+    shopCarMap.cutDownId = this.data.cutdownInfo.cutDownId;
+    //商品图片
+    shopCarMap.pic = this.data.cutdownInfo.goodsPic;
+    //商品名称
+    shopCarMap.name = this.data.cutdownInfo.goodsName;
+    //商品规格组合ID
+    shopCarMap.propertyChildIds = this.data.cutdownInfo.propertiesJoint;
+    //当前价格
+    shopCarMap.price = this.data.cutdownInfo.currentPrice;
+    //商品副标签
+    shopCarMap.label = this.data.cutdownInfo.goodsLabel;
+    
     shopCarMap.left = "";
     shopCarMap.active = true;
-    shopCarMap.number = 1//this.data.buyNumber;
-    shopCarMap.logisticsType = this.data.goodsDetail.basicInfo.logisticsId;
-    shopCarMap.logistics = this.data.goodsDetail.logistics;
-    shopCarMap.weight = this.data.goodsDetail.basicInfo.weight;
+    //商品数 this.data.buyNumber;
+    shopCarMap.number = 1
+
+    shopCarMap.logisticsType = '快递';
+    shopCarMap.logistics = 1;
+
     var buyNowInfo = {};
     if (!buyNowInfo.shopNum) {
       buyNowInfo.shopNum = 0;
@@ -590,4 +554,5 @@ Page({
     buyNowInfo.shopList.push(shopCarMap);
     return buyNowInfo;
   }
+
 })

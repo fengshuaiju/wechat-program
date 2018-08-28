@@ -15,7 +15,7 @@
           {{item.address}}
         </view>
       </view>
-      <view class="right-edit" bindtap="editAddess" data-id="{{item.id}}"></view>
+      <view class="right-edit" bindtap="editAddess" data-id="{{item.userAddressId}}"></view>
     </view>
   </view>
   <view hidden="{{loadingMoreHidden ? true : false}}" class="no-more-goods">

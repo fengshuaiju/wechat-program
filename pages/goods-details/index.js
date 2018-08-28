@@ -221,10 +221,9 @@ Page({
     this.bindGuiGeTap();
   },
 
-  //一键开团，先存储开团信息，此时的开团信息为 INIT 成功开团后为 IN_PROGRESS 完成拼团后为 FINISHED
+  //一键开团，先存储开团信息，此时的开团状态为 INIT
   pingtuan: function () {
     var that = this;
-
     wx.request({
       url: app.globalData.urls + '/baby/group-booking/open',
       method: 'POST',
@@ -321,25 +320,23 @@ Page({
     // 计算当前价格
     if (canSubmit) {
       wx.request({
-        url: app.siteInfo.url + app.siteInfo.subDomain + '/baby/shop/goods/price',
+        url: app.globalData.urls + '/baby/shop/goods/price',
         data: {
           goodsId: that.data.goodsDetail.basicInfo.goodsId,
-          propertyChildIds: propertyChildIds.substring(0, propertyChildIds.length-1),
-          shopType: that.data.shopType
+          propertyChildIds: propertyChildIds.substring(0, propertyChildIds.length-1)
         },
         success: function (res) {
           that.setData({
-            selectSizePrice: res.data.price,
+            selectSizePrice: res.data.NORMAL,
             propertyChildIds: propertyChildIds.substring(0, propertyChildIds.length-1),
-            propertyChildNames: propertyChildNames,
+            propertyChildNames: propertyChildNames.substring(0, propertyChildNames.length - 1),
             buyNumMax: that.data.stores,
             buyNumber: (that.data.stores > 0) ? 1 : 0,
-            selectptPrice: res.data.price
+            selectptPrice: res.data.GROUP_BOOKING
           });
         }
       })
     }
-
     this.setData({
       goodsDetail: that.data.goodsDetail,
       canSubmit: canSubmit
@@ -391,7 +388,7 @@ Page({
 
     //shopCarInfo = {shopNum:12,shopList:[]}
   },
-	/**
+	/** 
 	  * 立即购买
 	  */
   buyNow: function () {
@@ -476,11 +473,11 @@ Page({
     setTimeout(function () {
       wx.hideLoading();
       //组建立即购买信息
-      var buyNowInfo = that.bulidupingTuanInfo();
+      var pingTuanInfo = that.bulidupingTuanInfo();
       // 写入本地存储
       wx.setStorage({
         key: "PingTuanInfo",
-        data: buyNowInfo
+        data: pingTuanInfo
       })
       that.closePopupTap();
       wx.navigateTo({
@@ -712,6 +709,8 @@ Page({
       }
     })
   },
+
+  //获取视频信息
   getVideoSrc: function (videoId) {
     var that = this;
     wx.request({
@@ -728,11 +727,15 @@ Page({
       }
     })
   },
+
+  //跳转到主页
   gohome: function () {
     wx.switchTab({
       url: "/pages/index/index"
     })
   },
+
+  //下方富文本区域
   tabFun: function (e) {
     var _datasetId = e.target.dataset.id;
     var _obj = {};
@@ -742,6 +745,7 @@ Page({
       tabArr: _obj
     });
   },
+
   //去参团
   addPingTuan: function (e) {
     var id = e.currentTarget.dataset.id;
@@ -750,6 +754,7 @@ Page({
       url: "/pages/pingtuan/index?id=" + id + "&uid=" + pid + "&gid=" + this.data.goodsDetail.basicInfo.id
     })
   },
+
   //查看我发起的拼团详情
   goPingtuanTap: function () {
     wx.navigateTo({

@@ -9,7 +9,7 @@ Page({
   selectTap: function (e) {
     var id = e.currentTarget.dataset.id;
     wx.request({
-      url: app.globalData.urls +'/user/shipping-address/update',
+      url: app.globalData.urls +'/baby/user/shipping-address/update',
       data: {
         token:app.globalData.token,
         id:id,
@@ -40,25 +40,29 @@ Page({
   onShow : function () {
     this.initShippingAddress();
   },
+
+  //获取我的地址列表
   initShippingAddress: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls +'/user/shipping-address/list',
+      url: app.globalData.urls +'/baby/user/shipping-address/list',
       data: {
-        token:app.globalData.token
+        username: app.globalData.username
       },
       success: (res) =>{
-        if (res.data.code == 0) {
-          that.setData({
-            addressList:res.data.data,
-            loadingMoreHidden: true
-          });
-        } else if (res.data.code == 700){
-          that.setData({
-            addressList: null,
-            loadingMoreHidden: false
-          });
-        }
+        if (res.statusCode == 200) {
+          if (res.data.length != 0){
+            that.setData({
+              addressList: res.data,
+              loadingMoreHidden: true
+            });
+          } else {
+            that.setData({
+              addressList: null,
+              loadingMoreHidden: false
+            });
+          }
+        } 
       }
     })
   }

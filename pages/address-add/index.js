@@ -16,13 +16,14 @@ Page({
   bindCancel: function () {
     wx.navigateBack({})
   },
+
+  //保存地址信息
   bindSave: function (e) {
     var that = this;
     var linkMan = e.detail.value.linkMan;
     var address = e.detail.value.address;
     var mobile = e.detail.value.mobile;
     var code = e.detail.value.code;
-
     if (linkMan == "") {
       wx.showModal({
         title: '提示',
@@ -55,6 +56,7 @@ Page({
       })
       return
     }
+
     var cityId = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].id;
     var districtId;
     if (this.data.selDistrict == "请选择" || !this.data.selDistrict) {
@@ -62,6 +64,7 @@ Page({
     } else {
       districtId = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].districtList[this.data.selDistrictIndex].id;
     }
+
     if (address == "") {
       wx.showModal({
         title: '提示',
@@ -78,34 +81,38 @@ Page({
       })
       return
     }
-    var apiAddoRuPDATE = "add";
     var apiAddid = that.data.id;
-    if (apiAddid) {
-      apiAddoRuPDATE = "update";
-    } else {
-      apiAddid = 0;
+    if (!apiAddid){
+      apiAddid = '';
     }
     wx.request({
-      url: app.globalData.urls + '/user/shipping-address/' + apiAddoRuPDATE,
+      url: app.globalData.urls + '/baby/user/shipping-address/addOrUpdate',
+      method: 'POST',
       data: {
-        token: app.globalData.token,
-        id: apiAddid,
-        provinceId: commonCityData.cityData[this.data.selProvinceIndex].id,
-        cityId: cityId,
-        districtId: districtId,
+        username: app.globalData.username,
+        userAddressId: apiAddid,
+
+        provinceCode: commonCityData.cityData[this.data.selProvinceIndex].id,
+        cityCode: cityId,
+        areaCode: districtId,
+
+        province: commonCityData.cityData[this.data.selProvinceIndex].name,
+        city: commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].name,
+        area: commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].districtList[this.data.selDistrictIndex].name,
+
         linkMan: linkMan,
         address: address,
         mobile: mobile,
-        code: code,
+        postalCode: code,
         isDefault: 'true'
       },
       success: function (res) {
-        if (res.data.code != 0) {
+        if (res.statusCode != 201) {
           // 登录错误 
           wx.hideLoading();
           wx.showModal({
             title: '失败',
-            content: res.data.msg,
+            content: '收货地址保存失败，请联系管理员',
             showCancel: false
           })
           return;
@@ -115,6 +122,8 @@ Page({
       }
     })
   },
+
+  //初始省市区信息，根据 level 来确定初始的信息
   initCityData: function (level, obj) {
     if (level == 1) {
       var pinkArray = [];
@@ -143,8 +152,9 @@ Page({
         districts: pinkArray
       });
     }
-
   },
+
+  //省份发生变化
   bindPickerProvinceChange: function (event) {
     var selIterm = commonCityData.cityData[event.detail.value];
     this.setData({
@@ -157,6 +167,8 @@ Page({
     })
     this.initCityData(2, selIterm)
   },
+
+  //城市发生变化
   bindPickerCityChange: function (event) {
     var selIterm = commonCityData.cityData[this.data.selProvinceIndex].cityList[event.detail.value];
     this.setData({
@@ -167,6 +179,8 @@ Page({
     })
     this.initCityData(3, selIterm)
   },
+
+  //最后的辖区项发生变化
   bindPickerChange: function (event) {
     var selIterm = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].districtList[event.detail.value];
     if (selIterm && selIterm.name && event.detail.value) {
@@ -176,31 +190,35 @@ Page({
       })
     }
   },
+
+  //事件e为已存在的一条地址信息做修改时 跳转过来的。
   onLoad: function (e) {
     var that = this;
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     this.initCityData(1);
     var id = e.id;
+    //暂时不知道事件e是做什么用的 先留下IF中的代码
     if (id) {
       // 初始化原数据
       wx.showLoading();
       wx.request({
-        url: app.globalData.urls + '/user/shipping-address/detail',
+        url: app.globalData.urls + '/baby/user/shipping-address/detail',
         data: {
-          token: app.globalData.token,
-          id: id
+          username: app.globalData.username,
+          userAddressId: id
         },
         success: function (res) {
           wx.hideLoading();
-          if (res.data.code == 0) {
+          if (res.statusCode == 200) {
             that.setData({
               id: id,
-              addressData: res.data.data,
-              selProvince: res.data.data.provinceStr,
-              selCity: res.data.data.cityStr,
-              selDistrict: res.data.data.areaStr
+              addressData: res.data,
+              selProvince: res.data.province,
+              selCity: res.data.city,
+              selDistrict: res.data.area
             });
-            that.setDBSaveAddressId(res.data.data);
+            //将数据绑定在输入框中
+            that.setDBSaveAddressId(res.data);
             return;
           } else {
             wx.showModal({
@@ -213,16 +231,18 @@ Page({
       })
     }
   },
+
+   //将数据绑定在输入框中
   setDBSaveAddressId: function (data) {
     var retSelIdx = 0;
     for (var i = 0; i < commonCityData.cityData.length; i++) {
-      if (data.provinceId == commonCityData.cityData[i].id) {
+      if (data.provinceCode == commonCityData.cityData[i].id) {
         this.data.selProvinceIndex = i;
         for (var j = 0; j < commonCityData.cityData[i].cityList.length; j++) {
-          if (data.cityId == commonCityData.cityData[i].cityList[j].id) {
+          if (data.cityCode == commonCityData.cityData[i].cityList[j].id) {
             this.data.selCityIndex = j;
             for (var k = 0; k < commonCityData.cityData[i].cityList[j].districtList.length; k++) {
-              if (data.districtId == commonCityData.cityData[i].cityList[j].districtList[k].id) {
+              if (data.areaCode == commonCityData.cityData[i].cityList[j].districtList[k].id) {
                 this.data.selDistrictIndex = k;
               }
             }
@@ -231,22 +251,25 @@ Page({
       }
     }
   },
-  selectCity: function () {
 
+  selectCity: function () {
   },
+
   deleteAddress: function (e) {
     var that = this;
-    var id = e.currentTarget.dataset.id;
+    var userAddressId = e.currentTarget.dataset.id;
+    console.log(userAddressId)
     wx.showModal({
       title: '提示',
       content: '确定要删除该收货地址吗？',
       success: function (res) {
         if (res.confirm) {
           wx.request({
-            url: app.siteInfo.url + app.siteInfo.subDomain + '/user/shipping-address/delete',
+            url: app.globalData.urls + '/baby/user/shipping-address/delete',
+            method: 'DELETE',
             data: {
-              token: app.globalData.token,
-              id: id
+              username: app.globalData.username,
+              userAddressId: userAddressId
             },
             success: (res) => {
               wx.navigateBack({})
@@ -258,6 +281,8 @@ Page({
       }
     })
   },
+
+  //从微信读取
   readFromWx: function () {
     let that = this;
     wx.chooseAddress({
@@ -289,11 +314,11 @@ Page({
 
           }
         }
-
         that.setData({
           wxaddress: res,
         });
       }
     })
   }
+
 })
