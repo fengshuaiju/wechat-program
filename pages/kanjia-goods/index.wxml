@@ -30,9 +30,9 @@
       <view class="goods-title">{{goodsDetail.basicInfo.name}}</view>
       <view class="goods-characteristic">{{goodsDetail.basicInfo.characteristic}}</view>
       <view class="goods-price">
-        <text>底价</text>Ұ{{goodsDetail.basicInfo.minPrice}}</view>
+        <text>底价</text>Ұ{{goodsDetail.basicInfo.price.CUT_DOWN}}</view>
       <view class="goods-originalPrice">
-        <text>原价</text>Ұ{{goodsDetail.basicInfo.originalPrice}}</view>
+        <text>原价</text>Ұ{{goodsDetail.basicInfo.price.NORMAL}}</view>
       <view class="piangjia">
         库存 {{goodsDetail.basicInfo.stores}}
       </view>
@@ -77,7 +77,7 @@
   </view>
 
   <view class="footer-box"  wx:if="{{!alreadyHasCutDown}}" bindtap='bindGuiGeTap'>
-    立即发起砍价，最低可砍到 {{goodsDetail.basicInfo.minPrice}} 元
+    立即发起砍价，最低可砍到 {{goodsDetail.basicInfo.price.CUT_DOWN}} 元
   </view>
 
   <view class="footer-box"  wx:if="{{alreadyHasCutDown}}" bindtap='myKanjia'>

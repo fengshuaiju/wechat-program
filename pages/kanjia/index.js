@@ -254,6 +254,7 @@ Page({
       that.data.joiner = e.joiner;
       that.data.share = e.share;
       that.data.kanjiashare = e.kanjiashare;
+      that.data.buyNumber = e.buyNumber;
       if (e.share == 1) {
         setTimeout(function () {
           that.setData({
@@ -538,8 +539,8 @@ Page({
     
     shopCarMap.left = "";
     shopCarMap.active = true;
-    //商品数 this.data.buyNumber;
-    shopCarMap.number = 1
+    //商品数
+    shopCarMap.buyNumber = this.data.cutdownInfo.buyNumber;
 
     shopCarMap.logisticsType = '快递';
     shopCarMap.logistics = 1;

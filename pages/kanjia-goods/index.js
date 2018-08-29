@@ -89,7 +89,6 @@ Page({
       success: function(res) {
         that.setData({
           goodsDetail: res.data,
-          cutDownPrice: res.data.basicInfo.pingtuanPrice,
           buyNumMax:res.data.basicInfo.stores,
           buyNumber:(res.data.basicInfo.stores>0) ? 1: 0,
           stores: res.data.basicInfo.stores,

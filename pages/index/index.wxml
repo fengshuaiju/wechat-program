@@ -44,7 +44,8 @@
       <image src="{{item.mainPic}}" />
       <view class="goods-list-title">{{item.name}}</view>
       <view class="goods-list-text">{{item.characteristic}}</view>
-      <view class="goods-list-money">Ұ{{item.minPrice}}</view>
+      <view wx:if="{{item.pingtuan}}" class="goods-list-money">Ұ{{item.price.GROUP}}</view>
+      <view wx:if="{{!item.pingtuan}}" class="goods-list-money">Ұ{{item.price.CHEAP}}</view>
     </view>
   </view>
   <!--人气推荐，结束-->
@@ -80,11 +81,11 @@
         <view class="kanjia-list-info-info">{{item.characteristic}}</view>
         <view class="kanjia-list-info-money">
           <view class="kanjia-list-info-money-a">
-            <text class="a">Ұ{{item.minPrice}}</text>
+            <text class="a">Ұ{{item.price.CUT_DOWN}}</text>
             <text class="b">底价</text>
           </view>
           <view class="kanjia-list-info-money-a">
-            <text>Ұ{{item.originalPrice}}</text>
+            <text>Ұ{{item.price.NORMAL}}</text>
             <text>原价</text>
           </view>
           <view class="kanjia-list-info-money-a">

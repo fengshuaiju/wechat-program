@@ -32,7 +32,7 @@
         <text class="min">{{cutTotalAmount}}</text>元
       </view>
       <!--砍价未成功显示-->
-      <view class="btn-two" wx:if="{{!cutdownInfo.finished}}">
+      <view class="btn-two" wx:if="{{cutdownInfo.status != 'SUCCESS'}}">
         <view class="btn-he" bindtap="helpKanjia" wx:if="{{!kanjiaInfoMyHelp && userID != cutdownInfo.initiator}}">帮好友砍一刀</view>
         <view class="btn-he" bindtap="helpKanjia" wx:if="{{!kanjiaInfoMyHelp && userID == cutdownInfo.initiator}}">自己先砍一刀</view>
         <view class="btn-he btn-he-no" wx:if="{{kanjiaInfoMyHelp && userID != cutdownInfo.initiator}}">已帮好友砍 {{kanjiaInfoMyHelp.cutPrice}} 元</view>
@@ -40,12 +40,12 @@
         <view class="btn-me" bindtap="getshare" wx:if="{{userID == cutdownInfo.initiator}}">邀请好友砍价</view>
         <view class="btn-me" bindtap="getkanjia" wx:if="{{userID != cutdownInfo.initiator}}">我也要砍价</view>
       </view>
-      <view class="btn-two" wx:if="{{cutdownInfo.finished}}">
+      <view class="btn-two" wx:if="{{cutdownInfo.status == 'SUCCESS'}}">
         <!--砍价成功显示-->
         <view class="btn-succse" bindtap="gopay" wx:if="{{userID == cutdownInfo.initiator}}">商品已经砍价成功,去付款</view>
         <view class="btn-succse btn-he-no" bindtap="getkanjia" wx:if="{{userID != cutdownInfo.initiator}}">好友已经砍价成功，我也要砍价</view>
       </view>
-      <view wx:if="{{!cutdownInfo.finished}}" class="kanjia-info-times">
+      <view wx:if="{{cutdownInfo.status != 'SUCCESS'}}" class="kanjia-info-times">
         <text wx:if="{{countDownDay != 00}}" class="day">{{countDownDay}}</text>
         <text wx:if="{{countDownDay != 00}}" class="ac">:</text>
         <text wx:if="{{countDownHour != 00}}" class="hou">{{countDownHour}}</text>

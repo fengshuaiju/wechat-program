@@ -33,18 +33,18 @@
         <view class="goods-ptuan-box">
           <view class="goods-ptuan">
             拼团价 Ұ
-            <text>{{goodsDetail.basicInfo.pingtuanPrice}}</text>
+            <text>{{goodsDetail.basicInfo.price.GROUP}}</text>
           </view>
           <view class="goods-ptuan-info">
             <text class="txa">{{pingtuan.numberRequire}}人开团</text>
-            <text class="txb">原价 Ұ{{selectSizePrice}}</text>
+            <text class="txb">原价 Ұ{{goodsDetail.basicInfo.price.NORMAL_RANGE}}</text>
           </view>
           <view class="goods-right">已团{{pingtuan.numberSuccess}}件</view>
         </view>
       </block>
       <block wx:if="{{goodsDetail.basicInfo.pingtuan == false}}">
-        <view class="goods-price">Ұ {{selectSizePrice}}</view>
-        <view class="goods-originalPrice">Ұ {{goodsDetail.basicInfo.originalPrice}}</view>
+        <view class="goods-price">Ұ {{goodsDetail.basicInfo.price.CHEAP}}</view>
+        <view class="goods-originalPrice">Ұ {{goodsDetail.basicInfo.price.NORMAL_RANGE}}</view>
         <view class="piangjia">
           已售 {{goodsDetail.basicInfo.numberOrders}}
         </view>
@@ -141,11 +141,11 @@
       </block>
       <block wx:if="{{!ptuanCt}}">
         <view class="box-title ono" bindtap="tobuy">
-          <view class="boxshop-yuan">Ұ {{selectSizePrice}}</view>
+          <view class="boxshop-yuan">Ұ {{goodsDetail.basicInfo.price.NORMAL}}</view>
           <view class="box-shop-cart">原价购买</view>
         </view>
         <view class="box-title buy-now twt" bindtap="pingtuan">
-          <view class="boxshop-yuan">Ұ {{goodsDetail.basicInfo.pingtuanPrice}}</view>
+          <view class="boxshop-yuan">Ұ {{goodsDetail.basicInfo.price.GROUP}}</view>
           <view class="box-shop-cart">一键开团</view>
         </view>
       </block>
@@ -182,8 +182,8 @@
         </view>
         <view class="pop-goods-des">
           <view class="pop-goods-title">{{goodsDetail.basicInfo.name}}</view>
-          <view class="pop-goods-price" wx:if="{{shopType =='addShopCar' || shopType =='tobuy'}}">¥ {{selectSizePrice}}</view>
-          <view class="pop-goods-price" wx:if="{{shopType =='pingtuan'}}">¥ {{selectptPrice}}</view>
+          <view class="pop-goods-price" wx:if="{{shopType =='addShopCar' || shopType =='tobuy'}}">¥ {{selectPrice}}</view>
+          <view class="pop-goods-price" wx:if="{{shopType =='pingtuan'}}">¥ {{selectPrice}}</view>
         </view>
         <view class="pop-goods-close" bindtap="closePopupTap"></view>
       </view>

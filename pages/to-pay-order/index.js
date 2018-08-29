@@ -59,7 +59,12 @@ Page({
       if (buyNowInfoMem && buyNowInfoMem.shopList) {
         shopList = buyNowInfoMem.shopList
       }
-    } else {
+      that.setData({
+        ordersType: 'NORMAL'
+      });
+    } 
+    
+    else {
       //购物车下单
       var shopCarInfoMem = wx.getStorageSync('shopCarInfo');
       if (shopCarInfoMem && shopCarInfoMem.shopList) {
@@ -86,7 +91,6 @@ Page({
   },
 
   createOrder: function (e) {
-
     wx.showLoading();
     var that = this;
     var loginToken = app.globalData.username // 用户登录 token
@@ -119,7 +123,7 @@ Page({
       }
     }
     //获取收货地址ID
-    if (that.data.curCoupon) {
+    if (that.data.curAddressData) {
       postData.addressId = that.data.curAddressData.userAddressId;
     }else{
       wx.hideLoading();
@@ -222,7 +226,7 @@ Page({
     for (let i = 0; i < goodsList.length; i++) {
       let carShopBean = goodsList[i];
 
-      allGoodsPrice += carShopBean.price * carShopBean.number;
+      allGoodsPrice += carShopBean.price * carShopBean.buyNumber;
 
       var goodsJsonStrTmp = '';
       if (i > 0) {
@@ -238,7 +242,7 @@ Page({
 
       goodsJsonStrTmp += 
       '{"goodsId":' + carShopBean.goodsId + 
-      ',"number":' + carShopBean.number + 
+      ',"buyNumber":' + carShopBean.buyNumber + 
       ',"propertyChildIds":"' + carShopBean.propertyChildIds + 
       '", "inviterId":"' + inviter_id +
       '", "goodsLabel":"' + carShopBean.label
