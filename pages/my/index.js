@@ -1,165 +1,89 @@
-const app = getApp()
+const app = getApp();
+var util = require('../../utils/util.js')
+
 Page({
 	data: {
-    balance:0,
-    freeze:0,
+    amount:0,
+    freeze:0,//冻结金额
     score:0,
-    score_sign_continuous:0,
+    continueDays:0,
+    isSigned: false,
     tabClass: ["", "", "", "", ""]
   },
-  goorderlist (e){
-    var id = e.currentTarget.dataset.index;
-    wx.navigateTo({
-      url: "/pages/order-list/index?currentType=" + id
-    })
-  },
+ 
   onLoad: function () {
-    this.getUserApiInfo();
     this.getUserAmount();
     this.checkScoreSign();
-    this.getInfo();
   },
   onShow() {
-    this.getUserApiInfo();
     this.getUserAmount();
     this.checkScoreSign();
-    this.getInfo();
-    //更新订单状态
-    var that = this;
-    wx.request({
-      url: app.globalData.urls + '/order/statistics',
-      data: { token: app.globalData.token },
-      success: function (res) {
-        if (res.data.code == 0) {
-          if (res.data.data.count_id_no_pay > 0) {
-            wx.setTabBarBadge({
-              index: 3,
-              text: '' + res.data.data.count_id_no_pay + ''
-            })
-          } else {
-            wx.removeTabBarBadge({
-              index: 3,
-            })
-          }
-          that.setData({
-            noplay: res.data.data.count_id_no_pay,
-            notransfer: res.data.data.count_id_no_transfer,
-            noconfirm: res.data.data.count_id_no_confirm,
-            noreputation: res.data.data.count_id_no_reputation
-          });
-        }
-      }
-    })
-    wx.getStorage({
-      key: 'shopCarInfo',
-      success: function (res) {
-        if (res.data) {
-          that.data.shopCarInfo = res.data
-          if (res.data.shopNum > 0) {
-            wx.setTabBarBadge({
-              index: 2,
-              text: '' + res.data.shopNum + ''
-            })
-          } else {
-            wx.removeTabBarBadge({
-              index: 2,
-            })
-          }
-        } else {
-          wx.removeTabBarBadge({
-            index: 2,
-          })
-        }
-      }
-    })
-  },	
-  getUserApiInfo: function () {
-    var that = this;
-    wx.request({
-      url: app.globalData.urls + '/user/detail',
-      data: {
-        token: app.globalData.token
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          that.setData({
-            apiUserInfoMap: res.data.data
-          });
-        }
-      }
-    })
+    //更新订单状态    
+    util.order();
   },
+
+  //授权获取用户信息
+  bindGetUserInfo: function (e) {
+    var msg = e.detail.errMsg;
+    console.log(e);
+    //授权成功
+    if (msg == "getUserInfo:ok"){
+      var userInfo = e.detail.userInfo;
+      wx.request({
+        url: app.globalData.urls + '/accounts/v1/users',
+        method: 'PUT',
+        header: {
+          'Authorization': 'Bearer ' + app.globalData.token
+        },
+        data: userInfo,
+        success: function (res) {
+          if (res.statusCode == 204) {
+            console.log("success");
+          }
+        }
+      })
+
+    }
+  },
+
+  //获取用户账户信息
   getUserAmount: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/user/amount',
+      url: app.globalData.urls + '/baby/user/account',
       data: {
-        token: app.globalData.token
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          that.setData({
-            balance: res.data.data.balance,
-            freeze: res.data.data.freeze,
-            score: res.data.data.score
-          });
-        }
-      }
-    })
-  },
-  getInfo: function () {
-    var that = this;
-    wx.request({
-      url: app.globalData.urls + '/baby/open/config/get-value',
-      data: {
-        key: "mallinfo"
+        username: app.globalData.username
       },
       success: function (res) {
         if (res.statusCode == 200) {
           that.setData({
-            getInfo: res.data.value
+            amount: res.data.amount,
+            score: res.data.score
           });
         }
       }
     })
   },
+
+  //检查是否签到过
   checkScoreSign: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/score/today-signed',
+      url: app.globalData.urls + '/baby/score/today-signed',
       data: {
-        token: app.globalData.token
+        username: app.globalData.username
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            score_sign_continuous: res.data.data.continuous
+            isSigned: res.data.isSigned,
+            continueDays: res.data.continueDays
           });
         }
       }
     })
   },
-  scoresign: function () {
-    var that = this;
-    wx.request({
-      url: app.globalData.urls + '/score/sign',
-      data: {
-        token: app.globalData.token
-      },
-      success: function (res) {
-        if (res.data.code == 0) {
-          that.getUserAmount();
-          that.checkScoreSign();
-        } else {
-          wx.showModal({
-            title: '错误',
-            content: res.data.msg,
-            showCancel: false
-          })
-        }
-      }
-    })
-  },
+
   relogin:function(){
     var that = this;
     wx.authorize({
@@ -184,6 +108,17 @@ Page({
       }
     })
   },
+
+  /////////////////
+
+  //转跳到不同状态的订单列表页
+  goorderlist(e) {
+    var id = e.currentTarget.dataset.index;
+    wx.navigateTo({
+      url: "/pages/order-list/index?currentType=" + id
+    })
+  },
+
   address: function () {
     wx.navigateTo({
       url: "/pages/select-address/index"

@@ -121,7 +121,7 @@
 </view>
 
 <!--新人红包-->
-<image class="newcoupons-hover" src="{{newcoupons.linkUrl}}" hidden="{{flag}}" bindtap="hoverNewcoupons" />
+<image class="newcoupons-hover" src="{{newcoupons.linkUrl}}" hidden="{{hiddenNewcoupons}}" bindtap="hoverNewcoupons" />
 <!--点开浮动红包窗口后的红包信息-->
 <view class="modal-box" hidden="{{hovercoupons}}" bindtap="hide">
   <view class="modal-body">

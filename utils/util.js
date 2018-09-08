@@ -16,19 +16,40 @@ function formatNumber(n) {
 function order() {
   wx.request({
     url: app.globalData.urls + '/baby/order/statistics',
-    data: { token: app.globalData.token },
+    data: { 
+      username: app.globalData.username 
+    },
     success: function (res) {
-      if (res.data.code == 0) {
-        if (res.data.data.count_id_no_pay > 0) {
+      if (res.statusCode == 200) {
+        
+        // 购物车待购物数
+        if (res.data.shopCarNumber > 0){
+          wx.setTabBarBadge({
+            index: 2,
+            text: '' + res.data.shopCarNumber + ''
+          })
+        }else{
+          wx.removeTabBarBadge({
+            index: 2,
+          })
+        }
+
+
+
+        // 待支付订单数
+        if (res.data.count_id_no_pay > 0) {
           wx.setTabBarBadge({
             index: 3,
-            text: '' + res.data.data.count_id_no_pay + ''
+            text: '' + res.data.count_id_no_pay + ''
           })
         } else {
           wx.removeTabBarBadge({
             index: 3,
           })
         }
+
+
+
       }
     }
   })

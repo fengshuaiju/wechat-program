@@ -15,14 +15,13 @@ Page({
   getMyCoupons: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/discounts/my',
+      url: app.globalData.urls + '/baby/discounts/my',
       data: {
-        token: app.globalData.token,
-        status: 0
+        username: app.globalData.username
       },
       success: function (res) {
-        if (res.data.code == 0) {
-          var coupons = res.data.data;
+        if (res.statusCode == 200) {
+          var coupons = res.data;
           if (coupons.length > 0) {
             that.setData({
               coupons: coupons,

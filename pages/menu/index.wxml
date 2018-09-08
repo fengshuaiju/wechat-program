@@ -1,4 +1,5 @@
 <view class="container {{iphone}}">
+
   <view class="type-header-menu">
     <view class="type-search">
       <image src="../../images/search.png" />
@@ -6,20 +7,26 @@
       <view hidden="{{search}}" bindtap="searchclose" class="header-search-btn">取消</view>
     </view>
   </view>
+
   <view class="type-container-boxx">
+    <!-- 左侧栏目 -->
     <view class="type-container">
-      <view wx:for-items="{{categories}}" wx:key="id" class="type-box" bindtap="tabClick" id="{{item.id}}">
-        <view class="type-navbar-item {{activeCategoryId == item.id ? 'type-item-on' : ''}}">
+      <view wx:for-items="{{categories}}" wx:key="id" class="type-box" bindtap="tabClick" id="{{item.categoryId}}">
+        <view class="type-navbar-item {{activeCategoryId == item.categoryId ? 'type-item-on' : ''}}">
           {{item.name}}
         </view>
       </view>
     </view>
+
+    <!-- 右侧栏 -->
     <view class="type-list">
+
+      <!-- 滚动栏 -->
       <view class="swiper-container">
         <swiper class="swiper_box" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" bindchange="swiperchange">
           <block wx:for="{{banners}}" wx:key="id">
             <swiper-item>
-              <image bindtap="toDetailsTap" data-id="{{item.businessId}}" src="{{item.picUrl}}_m" class="slide-image" mode="widthFix" />
+              <image bindtap="toDetailsTap" data-id="{{item.goodsId}}" src="{{item.picUrl}}_m" class="slide-image" mode="widthFix" />
             </swiper-item>
           </block>
         </swiper>
@@ -29,9 +36,10 @@
           </block>
         </view>
       </view>
+      <!-- 分类商品 -->
       <view if="{{item.level == 2}}" class="type-menu">
         <view class="type-level-box" wx:for-items="{{categorieslist}}" wx:key="id">
-          <view id="{{item.id}}" class="type-level-item " bindtap="levelClick" data-id="{{item.id}}">
+          <view id="{{item.id}}" class="type-level-item " bindtap="levelClick" data-id="{{item.categoryId}}">
             <image class="type-img" src="{{item.icon}}" mode="widthFix"></image>
             <text>{{item.name}}</text>
           </view>
@@ -40,17 +48,19 @@
     </view>
   </view>
 </view>
+
+<!-- 展示搜索结果 -->
 <view hidden="{{search}}" class="search-box {{iponesc}}">
   <view hidden="{{searchidden}}" class="goods-box" wx:for-items="{{searchs}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.id}}">
     <view class="img-box">
-      <image src="{{item.pic}}_m" class="image" mode="widthFix" lazy-load="true" />
+      <image src="{{item.mainPic}}_m" class="image" mode="widthFix" lazy-load="true" />
       <view class="goods-characteristic">
         <text>{{item.characteristic}}</text>
       </view>
     </view>
     <view class="goods-title">{{item.name}}</view>
     <view style='display:flex;'>
-      <view class="goods-price">Ұ{{item.minPrice}}</view>
+      <view class="goods-price">Ұ{{item.price.CHEAP}}</view>
       <view class="goods-price-naver">已售{{item.numberOrders}}</view>
     </view>
   </view>

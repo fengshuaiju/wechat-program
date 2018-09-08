@@ -274,7 +274,7 @@ page {
   color: #a18d65;
   height: 35px;
   line-height: 35px;
-  position: absolute;
+  /* position: absolute; */
   left: 0;
   bottom: 0;
   width: 100%;

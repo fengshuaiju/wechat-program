@@ -33,28 +33,25 @@ Page({
     })
 
   },
+
+  //TODO
   tapTopic: function (e) {
     this.setData({
       activecmsid: e.currentTarget.dataset.id
     });
     this.gettapList(this.data.activecmsid);
   },
+
   gettapList: function (cmsid) {
     var that = this;
     wx.request({
       url: app.globalData.urls + '/baby/cms/news/list',
       success: function (res) {
-        var content = [];
         if (res.statusCode == 200) {
-          for (var i = 0; i < res.data.length; i++) {
-            if (res.data[i].categoryId == cmsid) {
-              content.push(res.data[i]);
-            }
-          }
+          that.setData({
+            contents: res.data.content
+          });
         }
-        that.setData({
-          contents: content
-        });
       }
     })
   }

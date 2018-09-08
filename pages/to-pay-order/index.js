@@ -23,7 +23,7 @@ Page({
     ordersType: null //该type为创建订单用
   },
 
-  onShow: function () {
+  onShow: function() {
     var that = this;
     var shopList = [];
     //砍价下单
@@ -34,7 +34,7 @@ Page({
           shopList = buykjInfoMem.shopList
         }
         that.setData({
-          cutDownId: buykjInfoMem.shopList[0].cutDownId, 
+          cutDownId: buykjInfoMem.shopList[0].cutDownId,
           ordersType: 'CUT_DOWN'
         });
       }
@@ -62,17 +62,15 @@ Page({
       that.setData({
         ordersType: 'NORMAL'
       });
-    } 
-    
+    }
+
+    //购物车下单
     else {
-      //购物车下单
-      var shopCarInfoMem = wx.getStorageSync('shopCarInfo');
-      if (shopCarInfoMem && shopCarInfoMem.shopList) {
-        // shopList = shopCarInfoMem.shopList
-        shopList = shopCarInfoMem.shopList.filter(entity => {
-          return entity.active;
-        });
-      }
+      shopList = wx.getStorageSync('shopCarInfo-topay');
+      console.log(shopList);
+      that.setData({
+        ordersType: 'SHOPPING_CART'
+      });
     }
     that.setData({
       goodsList: shopList,
@@ -80,9 +78,13 @@ Page({
     that.initShippingAddress();
   },
 
-  onLoad: function (e) {
+  onLoad: function(e) {
     var that = this;
-    if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
+    if (app.globalData.iphone == true) {
+      that.setData({
+        iphone: 'iphone'
+      })
+    }
     //显示收货地址标识
     that.setData({
       isNeedLogistics: 1,
@@ -90,7 +92,7 @@ Page({
     });
   },
 
-  createOrder: function (e) {
+  createOrder: function(e) {
     wx.showLoading();
     var that = this;
     var loginToken = app.globalData.username // 用户登录 token
@@ -122,10 +124,11 @@ Page({
         return;
       }
     }
+
     //获取收货地址ID
     if (that.data.curAddressData) {
       postData.addressId = that.data.curAddressData.userAddressId;
-    }else{
+    } else {
       wx.hideLoading();
       wx.showModal({
         title: '错误',
@@ -144,6 +147,9 @@ Page({
       data: postData, // 设置请求的 参数
       success: (res) => {
         wx.hideLoading();
+        if (res.statusCode == 201){
+          that.clearData();
+        }
         if (res.statusCode != 201) {
           wx.showModal({
             title: '错误',
@@ -153,12 +159,14 @@ Page({
           return;
         }
 
+
         //清空购物车数据
-        if (e && "buyNow" != that.data.orderType) {
-          wx.removeStorageSync('shopCarInfo');
-          wx.removeStorageSync('buykjInfo');
-          wx.removeStorageSync('PingTuanInfo');
-        }
+        // if (e && "buyNow" != that.data.orderType) {
+        //   wx.removeStorageSync('shopCarInfo');
+        //   wx.removeStorageSync('buykjInfo');
+        //   wx.removeStorageSync('PingTuanInfo');
+        // }
+
 
         //TODO 暂时不推送消息
         // 配置模板消息推送
@@ -187,8 +195,67 @@ Page({
     })
   },
 
+
+  clearData: function() {
+    var that = this;
+    //如果是购物车购物，清空现在的购物车并重新获取购物车数据
+    if ("SHOPPING_CART" == that.data.ordersType) {
+      wx.removeStorageSync('shopCarInfo');
+      setTimeout(function() {
+        wx.request({
+          url: app.globalData.urls + '/baby/shop/goods/shop-car',
+          data: {
+            username: app.globalData.username
+          },
+          success: function(res) {
+            var shopCarInfo = {};
+            shopCarInfo.shopList = [];
+            shopCarInfo.shopNum = 0;
+
+            if (res.statusCode == 200) {
+              var list = [];
+              var totalBuy = 0;
+              if (res.data.length != 0) {
+                var shopCarInfo = [];
+                shopCarInfo = res.data;
+                for (let i = 0; i < shopCarInfo.length; i++) {
+                  // 构建购物车信息
+                  var shopCarMap = {};
+                  shopCarMap.goodsId = shopCarInfo[i].goodsId;
+                  //商品图片
+                  shopCarMap.pic = shopCarInfo[i].mainPic;
+                  //商品名称
+                  shopCarMap.name = shopCarInfo[i].goodsName;
+                  //商品规格组合ID
+                  shopCarMap.propertyChildIds = shopCarInfo[i].propertiesJoint;
+                  //商品副信息
+                  shopCarMap.label = shopCarInfo[i].label;
+                  //选中的商品价格
+                  shopCarMap.price = shopCarInfo[i].price;
+                  //要购买的件数
+                  shopCarMap.buyNumber = shopCarInfo[i].buyNumber;
+
+                  totalBuy = totalBuy + shopCarInfo[i].buyNumber;
+                  list.push(shopCarMap);
+                }
+
+                shopCarInfo.shopList = list;
+                shopCarInfo.shopNum = totalBuy;
+                // 写入本地存储
+                wx.setStorage({
+                  key: "shopCarInfo",
+                  data: shopCarInfo
+                })
+              }
+            }
+          }
+        })
+      }, 1500)
+    }
+  },
+
   //获取默认收货地址
-  initShippingAddress: function () {
+  initShippingAddress: function() {
     var that = this;
     wx.request({
       url: app.globalData.urls + '/baby/user/shipping-address/default',
@@ -197,12 +264,12 @@ Page({
       },
       success: (res) => {
         if (res.statusCode == 200) {
-          if (res.data){
+          if (res.data) {
             that.setData({
               curAddressData: res.data,
               isNeedLogistics: 1
             });
-          }else{
+          } else {
             wx.showModal({
               title: '错误',
               content: '请先设置您的收货地址！',
@@ -216,7 +283,7 @@ Page({
   },
 
   //计算运费以及组合订单信息
-  processYunfei: function () {
+  processYunfei: function() {
     var that = this;
     var goodsList = this.data.goodsList;
     var goodsJsonStr = "[";
@@ -240,17 +307,18 @@ Page({
         inviter_id = inviter_id_storge;
       }
 
-      goodsJsonStrTmp += 
-      '{"goodsId":' + carShopBean.goodsId + 
-      ',"buyNumber":' + carShopBean.buyNumber + 
-      ',"propertyChildIds":"' + carShopBean.propertyChildIds + 
-      '", "inviterId":"' + inviter_id +
-      '", "goodsLabel":"' + carShopBean.label
-      +'"}';
+      goodsJsonStrTmp +=
+        '{"goodsId":' + carShopBean.goodsId +
+        ',"buyNumber":' + carShopBean.buyNumber +
+        ',"propertyChildIds":"' + carShopBean.propertyChildIds +
+        '","shoppingCartId":"' + carShopBean.shoppingCartId +
+        '", "inviterId":"' + inviter_id +
+        '", "goodsLabel":"' + carShopBean.label +
+        '"}';
       goodsJsonStr += goodsJsonStrTmp;
     }
     goodsJsonStr += "]";
-    
+
     //设置数据
     that.setData({
       goodsJsonStr: goodsJsonStr,
@@ -264,28 +332,28 @@ Page({
   //计算运费结束
 
   //添加地址
-  addAddress: function () {
+  addAddress: function() {
     wx.navigateTo({
       url: "/pages/address-add/index"
     })
   },
 
   //选择地址
-  selectAddress: function () {
+  selectAddress: function() {
     wx.navigateTo({
       url: "/pages/select-address/index"
     })
   },
 
   //获取我的红包
-  getMyCoupons: function () {
+  getMyCoupons: function() {
     var that = this;
     wx.request({
       url: app.globalData.urls + '/baby/discounts/my',
       data: {
         username: app.globalData.username
       },
-      success: function (res) {
+      success: function(res) {
         if (res.statusCode == 200) {
           // 过滤符合条件的红包，可以把过滤转到服务端做
           var coupons = res.data.filter(entity => {
@@ -303,7 +371,7 @@ Page({
   },
 
   //更换优惠券时触发
-  bindChangeCoupon: function (e) {
+  bindChangeCoupon: function(e) {
     const selIndex = e.detail.value[0] - 1;
     if (selIndex == -1) {
       this.setData({

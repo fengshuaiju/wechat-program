@@ -31,7 +31,7 @@
           </view>
           <view class="goods-title">{{item.name}}</view>
           <view style='display:flex;'>
-            <view class="goods-price">Ұ{{item.minPrice}}</view>
+            <view class="goods-price">Ұ{{item.price.CHEAP}}</view>
             <view class="goods-price-naver">已售{{item.numberOrders}}</view>
           </view>
         </view>

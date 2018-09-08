@@ -3,7 +3,8 @@
 var app = getApp()
 Page({
   data: {
-
+    page: 0,
+    size: 20
   },
 
   toDetailsTap: function (e) {
@@ -11,36 +12,40 @@ Page({
       url: "/pages/goods-details/index?id=" + e.currentTarget.dataset.id
     })
   },
+
   onLoad: function (e) {
     wx.showLoading();
     var that = this;
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     wx.request({
-      url: app.globalData.urls + '/baby/shop/goods/list',
+      url: app.globalData.urls + '/baby/shop/goods/search',
       data: {
-        categoryId: e.id
+        categoryId: e.id,
+        page: that.data.page,
+        size: that.data.size
       },
       success: function (res) {
         wx.hideLoading();
-        that.setData({
-          goods: [],
-          loadingMoreHidden: true
-        });
-        var goods = [];
-        if (res.statusCode != 200 || res.data.length == 0) {
+        if (res.statusCode == 200){
+          if (res.data.numberOfElements == 0) {
+            that.setData({
+              loadingMoreHidden: false,
+            });
+            return;
+          } else {
+            that.setData({
+              goods: res.data.content,
+              loadingMoreHidden: true
+            });
+            return;
+          }
+        }else{
           that.setData({
             loadingMoreHidden: false,
           });
           return;
         }
-        for (var i = 0; i < res.data.length; i++) {
-          goods.push(res.data[i]);
-        }
-        that.setData({
-          goods: goods,
-        });
       }
     })
   }
-
 })

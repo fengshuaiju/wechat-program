@@ -15,7 +15,7 @@
     </scroll-view>
   </view>
   <view class="topic-contents">
-    <view class="topic-content-list" wx:for="{{contents}}" wx:key="id" bindtap="tapContents" data-id="{{item.id}}">
+    <view class="topic-content-list" wx:for="{{contents}}" wx:key="id" bindtap="tapContents" data-id="{{item.cmsId}}">
       <image class="content-images" mode="widthFix" src="{{item.pic}}"></image>
       <view class="content-bg"></view>
       <view class="content-text">

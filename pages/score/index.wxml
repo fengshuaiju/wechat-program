@@ -1,4 +1,4 @@
-<view class="container {{iphone}}">
+ <view class="container {{iphone}}">
   <view class="header-container">
     <navigator open-type="navigateBack" delta="1" hover-class="navigator-hover">
       <image class="goback" src="../../images/goback.png" />
@@ -18,7 +18,7 @@
     </view>
   </view>
   <view class="score-center">
-    <view bindtap="{{ci == 0 ? 'scoresign':'error'}}" class="{{ci == 0 ? 'score-btn':'score-btn-none'}}">{{ci == 0 ? '签到':'已签到'}}</view>
+    <view bindtap="{{ci == false ? 'scoresign':'error'}}" class="{{ci == false ? 'score-btn':'score-btn-none'}}">{{ci == false ? '签到':'已签到'}}</view>
   </view>
   <view class="score-share">
     <view class="share-list">

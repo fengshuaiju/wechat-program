@@ -3,6 +3,8 @@
 var app = getApp()
 Page({
   data: {
+    page:0,
+    size:20
   },
 
   toDetailsTap: function (e) {
@@ -19,17 +21,19 @@ Page({
     var that = this;
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     wx.request({
-      url: app.globalData.urls + '/shop/goods/fav/list',
+      url: app.globalData.urls + '/baby/shop/goods/fav/list',
       data: {
-        token: app.globalData.token
+        page: that.data.page,
+        size: that.data.size,
+        username: app.globalData.username
       },
       success: function (res) {
-        if (res.data.code == 0) {
+        if (res.statusCode == 200) {
           that.setData({
-            favList: res.data.data,
+            favList: res.data.content,
             loadingMoreHidden: true
           });
-        } else if (res.data.code == 404) {
+        } else if (res.statusCode != 200) {
           that.setData({
             favList: null,
             loadingMoreHidden: false

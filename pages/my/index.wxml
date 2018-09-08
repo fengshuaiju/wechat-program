@@ -4,10 +4,10 @@
     <view class="iser-info-box">
       <open-data class="userinfo-nickname" type="userNickName"></open-data>
       <text class="userinfo-score" bindtap="score">积分：{{score}}</text>
-      <text wx:if="{{userInfo && score_sign_continuous == 0}}" class="userinfo-score-day" bindtap="score">今日未签到</text>
-      <text wx:if="{{userInfo && score_sign_continuous > 0}}" class="userinfo-score-day">已连续签到{{score_sign_continuous}}天</text>
+      <text wx:if="{{!isSigned}}" class="userinfo-score-day" bindtap="score">今日未签到</text>
+      <text wx:if="{{isSigned}}" class="userinfo-score-day">已连续签到{{continueDays}}天</text>
     </view>
-    <button  wx:if="{{!userInfo}}" open-type="getUserInfo"></button>
+    <button  wx:if="{{!userInfo}}" open-type="getUserInfo" bindgetuserinfo="bindGetUserInfo"></button>
 	</view>
   <view class="userinfo-item">
     <image src="../../images/profile_dfunding.png"></image>
@@ -38,7 +38,7 @@
   <view class="userinfo-item-box">
     <view class="userinfo-item" bindtap="withdraw">
       <image src="../../images/profile_tegral.png"></image>
-      <text>{{balance}}元</text>
+      <text>{{amount}}元</text>
       <navigator hover-class="none">我的余额</navigator>
     </view>
     <view class="userinfo-item" bindtap="mykanjia">
@@ -64,6 +64,6 @@
     </view>
   </view>
   <view class="userinfo-info">
-    {{getInfo}}
+    冯小帅
   </view>
 </view>

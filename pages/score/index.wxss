@@ -128,7 +128,7 @@ page{
   background-color: #a39f93;
   display:block;
   position:absolute;
-  margin-left:25px;
+  margin-left:19px;
   border-radius:50%;
   margin-top:3px;
 }

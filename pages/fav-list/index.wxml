@@ -3,14 +3,14 @@
     <navigator open-type="navigateBack" delta="1" hover-class="navigator-hover">
       <image class="goback" src="../../images/goback.png" />
     </navigator>
-    <view class="header-name">我的砍价</view>
+    <view class="header-name">我的收藏</view>
   </view>
   <view class="goods-box" wx:for-items="{{favList}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.goodsId}}">
     <view class="img-box">
-      <image src="{{item.pic}}_m" class="image" mode="aspectFill" lazy-load="true" />
+      <image src="{{item.goodsPic}}" class="image" mode="aspectFill" lazy-load="true" />
     </view>
-    <view class="goods-title">{{item.goodsName}}</view>
-    <view class="good-money">收藏时间：{{item.dateAdd}}</view>
+    <view class="goods-title">{{item.name}}</view>
+    <view class="good-money">收藏时间：{{item.addTime}}</view>
     <view class="title-opacity">查看详细</view>
   </view>
   <view hidden="{{loadingMoreHidden ? true : false}}" class="no-more-goods">

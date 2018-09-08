@@ -6,18 +6,18 @@
     <view class="header-name">我的礼券</view>
   </view>
   <view class="coupons-list">
-    <view class="coupons-item" wx:for-items="{{coupons}}" bindtap="gitCoupon" data-id="{{item.id}}">
-      <view class="money-left">{{item.money}}
+    <view class="coupons-item" wx:for="{{coupons}}" wx:key="{{index}}" bindtap="gitCoupon" data-id="{{item.id}}">
+      <view class="money-left">{{item.amountOfMoney}}
         <text>元</text>
       </view>
       <view class="money-right">
-        <view class="money-name">{{item.name}}</view>
-        <view class="money-hold">满{{item.moneyHreshold}}元使用</view>
+        <view class="money-name">{{item.couponName}}</view>
+        <view class="money-hold">满{{item.requirementConsumption}}元使用</view>
       </view>
       <view bindtap="gohome" class="money-home">去使用</view>
       <view class="money-line"></view>
       <view class="money-fooder">
-        {{item.dateEnd}}前有效
+        {{item.expiryTimeAt}}前有效
       </view>
     </view>
   </view>

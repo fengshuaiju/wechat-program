@@ -4,8 +4,8 @@ var util = require('../../utils/util.js')
 var app = getApp()
 Page({
   data: {
-    flag: true,
-    indicatorDots: true,
+    hiddenNewcoupons: true,
+    hasFetchNewcoupons: false,
     autoplay: true,
     interval: 6000,
     duration: 800,
@@ -71,21 +71,23 @@ Page({
   //用户自主领取优惠券
   newCoupon: function (e) {
     var that = this;
+
     wx.request({
       url: app.globalData.urls + '/baby/discounts/fetch',
+      method: 'POST',
       data: {
         couponId: e.currentTarget.dataset.id,//优惠券id
-        openId: app.globalData.username
+        username: app.globalData.username
       },
       success: function (res) {
-        if (res.statusCode == 200) {
+        if (res.statusCode == 201) {
           wx.showToast({
             title: '成功领取',
             icon: 'success',
             duration: 2000
           })
           that.setData({
-            flag: true
+            hiddenNewcoupons: true
           })
         }
       }
@@ -129,30 +131,31 @@ Page({
   },
   onShow: function () {
     var that = this;
-    wx.getStorage({
-      key: 'shopCarInfo',
-      success: function (res) {
-        if (res.data) {
-          that.data.shopCarInfo = res.data
-          if (res.data.shopNum > 0) {
-            wx.setTabBarBadge({
-              index: 2,
-              text: ''+res.data.shopNum+''
-            })
-          } else {
-            wx.removeTabBarBadge({
-              index: 2,
-            })
-          }
-        } else {
-          wx.removeTabBarBadge({
-            index: 2,
-          })
-        }
-      }
-    })
-
+    //检测购物车订单
     util.order()
+
+    //如果未领取红包，该页面上显示的红包还能不能领取，如果不能则隐藏掉该红包
+    //因为用户可以再礼券页面领取，如果仍显示红包会造成重复领取
+    if (!that.data.hasFetchNewcoupons){
+      wx.request({
+        url: app.globalData.urls + '/baby/discounts/newcoupons',
+        data: {
+          openId: app.globalData.username
+        },
+        success: function (res) {
+          if (res.statusCode == 200) {
+            if (res.data) {
+              that.setData({ hiddenNewcoupons: false });
+              that.setData({
+                newcoupons: res.data
+              });
+            }else{
+              that.setData({ hasFetchNewcoupons: true });
+            }
+          }
+        }
+      })
+    }
 
     setTimeout(function () {
       if (app.globalData.usinfo == 0) {
@@ -184,7 +187,9 @@ Page({
     //首页幻灯片
     wx.request({
       url: app.globalData.urls + '/baby/banner/slide-container',
-      data: {},
+      data: {
+        type: 'HOME'
+      },
       success: function (res) {
         if (res.statusCode == 200) {
           that.setData({
@@ -222,7 +227,7 @@ Page({
     })
     //获取砍价商品信息
     wx.request({
-      url: app.globalData.urls + '/baby/banner/cutdown',
+      url: app.globalData.urls + '/baby/cutdown',
       data: {},
       success: function (res) {
         if (res.statusCode == 200) {
@@ -235,7 +240,7 @@ Page({
 
     //获取精选专题信息
     wx.request({
-      url: app.globalData.urls + '/baby/banner/toptopic',
+      url: app.globalData.urls + '/baby/cms/news/list',
       data: {},
       success: function (res) {
         if (res.statusCode == 200) {
@@ -281,19 +286,20 @@ Page({
           return;
       }
       wx.request({
-        url: app.globalData.urls + '/baby/banner/newcoupons',
+        url: app.globalData.urls + '/baby/discounts/newcoupons',
         data: {
           openId: app.globalData.username
         },
         success: function (res) {
           if (res.statusCode == 200) {
             if (res.data){
-              that.setData({ flag: false });
+              that.setData({ hiddenNewcoupons: false });
               that.setData({
                 newcoupons: res.data
               });
+            }else{
+              that.setData({ hasFetchNewcoupons: true });
             }
-
           }
         }
       })

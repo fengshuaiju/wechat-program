@@ -32,7 +32,7 @@
       <view class="goods-price">
         <text>底价</text>Ұ{{goodsDetail.basicInfo.price.CUT_DOWN}}</view>
       <view class="goods-originalPrice">
-        <text>原价</text>Ұ{{goodsDetail.basicInfo.price.NORMAL}}</view>
+        <text>原价</text>Ұ{{goodsDetail.basicInfo.price.NORMAL_RANGE}}</view>
       <view class="piangjia">
         库存 {{goodsDetail.basicInfo.stores}}
       </view>

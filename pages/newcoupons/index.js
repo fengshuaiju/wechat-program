@@ -11,6 +11,7 @@ Page({
     this.data.coupons = e.detail.value;
     this.data.id = e.currentTarget.dataset.id;
   },
+
   //兑换
   listenerDuiHuan: function () {
     //console.log('id', this.data.coupons);
@@ -56,32 +57,20 @@ Page({
       }
     })
   },
+
   onLoad: function () {
     var that = this
     if (app.globalData.iphone == true) { that.setData({ iphone: 'iphone' }) }
     that.getCoupons();
-    wx.request({
-      url: app.globalData.urls + '/baby/banner/list',
-      data: {
-        key: 'mallName',
-        type: 'duihuan'
-      },
-      success: function (res) {
-        if (res.statusCode == 200 && app.globalData.system != 'key') {
-          that.setData({
-            banners: res.data,
-            busid: res.data[0].businessId
-          });
-        }
-      }
-    })
   },
+
+  //获取可领取的红包
   getCoupons: function () {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/baby/discounts/coupons',
+      url: app.globalData.urls + '/baby/discounts/available',
       data: {
-        type: 'shop'
+        username: app.globalData.username
       },
       success: function (res) {
         if (res.statusCode == 200) {
@@ -93,58 +82,29 @@ Page({
       }
     })
   },
+
   //点击领取礼券
   gitCoupon: function (e) {
     var that = this;
     wx.request({
-      url: app.globalData.urls + '/discounts/fetch',
+      url: app.globalData.urls + '/baby/discounts/fetch',
+      method: 'POST',
       data: {
-        id: e.currentTarget.dataset.id,
-        token: app.globalData.token
+        couponId: e.currentTarget.dataset.id,
+        username: app.globalData.username
       },
       success: function (res) {
-        if (res.data.code == 20001 || res.data.code == 20002) {
-          wx.showModal({
-            title: '错误',
-            content: '礼券已经领完了',
-            showCancel: false
-          })
-          return;
-        }
-        if (res.data.code == 20003) {
-          wx.showModal({
-            title: '错误',
-            content: '您已经领过了',
-            showCancel: false
-          })
-          return;
-        }
-        if (res.data.code == 30001) {
-          wx.showModal({
-            title: '错误',
-            content: '您的积分不足',
-            showCancel: false
-          })
-          return;
-        }
-        if (res.data.code == 20004) {
-          wx.showModal({
-            title: '错误',
-            content: '礼券已经过期',
-            showCancel: false
-          })
-          return;
-        }
-        if (res.data.code == 0) {
+        if (res.statusCode == 201) {
           wx.showToast({
             title: '礼券领取成功',
             icon: 'success',
             duration: 2000
           })
+          that.getCoupons();
         } else {
           wx.showModal({
             title: '错误',
-            content: res.data.msg,
+            content: '礼券领取失败！',
             showCancel: false
           })
         }
