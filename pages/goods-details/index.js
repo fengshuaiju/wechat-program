@@ -108,7 +108,7 @@ Page({
 
     //获取logo
     wx.request({
-      url: app.globalData.urls + '/baby/banner/top-logo',
+      url: app.globalData.urls + '/baby/open/config/top-logo',
       success: function(res) {
         if (res.statusCode == 200) {
           that.setData({
@@ -157,7 +157,7 @@ Page({
           goodsDetail: res.data,
           buyNumMax: res.data.basicInfo.stores,
           buyNumber: (res.data.basicInfo.stores > 0) ? 1 : 0,
-          isSupprotGroup: res.data.basicInfo.pingtuan,
+          isSupprotGroup: res.data.basicInfo.isSupportGroup,
           stores: res.data.basicInfo.stores
         });
         WxParse.wxParse('article', 'html', res.data.basicInfo.content, that, 5);
@@ -874,7 +874,7 @@ Page({
   },
 
   //查看我发起的拼团详情
-  goPingtuanTap: function() {
+  goGroupTap: function() {
     wx.navigateTo({
       url: "/pages/pingtuan/index?username=" + app.globalData.username + "&goodsId=" + this.data.goodsDetail.basicInfo.goodsId +
         "&groupBookingId=" + this.data.goodsDetail.basicInfo.goodsId

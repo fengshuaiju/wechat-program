@@ -124,7 +124,7 @@
   <view class="goods-button" bindtap="getShareBox">
     <image src="../../images/share.png"></image>
   </view>
-  <block wx:if="{{goodsDetail.basicInfo.pingtuan == true}}">
+  <block wx:if="{{goodsDetail.basicInfo.isSupportGroup == true}}">
     <view class="footer-box">
       <view class="box-list">
         <image src="../../images/goods_service.png"></image>
@@ -135,7 +135,7 @@
         <image wx:if="{{favicon == 1}}" src="../../images/goods_collect_checked.png"></image>
       </view>
       <block wx:if="{{ptuanCt}}">
-        <view class="box-title buy-now shares" bindtap="goPingtuanTap">
+        <view class="box-title buy-now shares" bindtap="goGroupTap">
           我已发起过拼团 | 查看拼团详情
         </view>
       </block>
@@ -151,7 +151,7 @@
       </block>
     </view>
   </block>
-  <block wx:if="{{goodsDetail.basicInfo.pingtuan == false}}">
+  <block wx:if="{{goodsDetail.basicInfo.isSupportGroup == false}}">
     <view class="footer-box">
       <view class="box-list">
         <image src="../../images/goods_service.png"></image>

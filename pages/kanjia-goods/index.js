@@ -68,7 +68,7 @@ Page({
 
     //首页顶部Logo
     wx.request({
-      url: app.globalData.urls + '/baby/banner/top-logo',
+      url: app.globalData.urls + '/baby/open/config/top-logo',
       data: {},
       success: function (res) {
         if (res.statusCode == 200) {
