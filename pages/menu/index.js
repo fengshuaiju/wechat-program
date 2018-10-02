@@ -119,7 +119,7 @@ Page({
     }),
 
     wx.request({
-      url: app.globalData.urls + '/baby/shop/goods/category/all',
+      url: app.globalData.urls + '/baby/category/all',
       success: function (res) {
         var categories = [{ categoryId: '0', name: "所有分类" }];
         if (res.statusCode == 200) {
