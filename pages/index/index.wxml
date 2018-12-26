@@ -52,16 +52,21 @@
 
 
   <!--中间隔条横线，拼团特惠-->
-  <view class="pingtuna-container">
-    <view class="pingtuna-title" bindtap="tapSales" data-id="pingtuna">
+  <view class="goods-container">
+    <view class="goods-title" bindtap="tapSales" data-id="topgoods">
       <text>拼团特惠</text>
       <image src="../../images/home_more.png" />
     </view>
-    <view class="pingtuna-list" wx:for="{{toptuan}}" wx:key="id" bindtap="toDetailsTap" data-id="{{item.goodsId}}">
-      <view class="pingtuna-list-title">{{item.name}}</view>
-      <view wx:if="{{item.characteristic}}" class="pingtuna-list-text">{{item.characteristic}}</view>
-      <view wx:if="{{item.remark}}" class="pingtuna-list-info">{{item.remark}}</view>
+    <view class="goods-list" wx:for="{{toptuan}}" wx:key="id" bindtap="toDetailsTap" data-id="{{item.goodsId}}">
       <image src="{{item.mainPic}}"/> 
+      <view class="goods-list-title">{{item.name}}</view>
+      <view wx:if="{{item.characteristic}}" class="goods-list-text">{{item.characteristic}}</view>
+      <view class="pintuan-price-sale">
+        <view wx:if="{{item.pingtuan}}" class="flex-item bc_green">Ұ{{item.price.GROUP}}</view>
+        <view wx:if="{{!item.pingtuan}}" class="goods-list-money">Ұ{{item.price.CHEAP}}</view>
+        <view class="pintuan-sale">已拼单5件</view>
+      </view>
+      
     </view>
   </view>
   <!--拼团特惠结束-->

@@ -398,6 +398,17 @@
   white-space: nowrap;
   overflow: hidden;
 }
+.pintuan-price-sale {
+  display: flex;
+  flex-direction:row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pintuan-sale {
+  font-size: 28rpx;
+  margin-right: 5px;
+}
 
 .goods-list-money {
   font-size: 30rpx;

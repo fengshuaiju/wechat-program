@@ -70,8 +70,8 @@ Page({
     var that = this;
     wx.request({
       url: app.globalData.urls + '/baby/score/today-signed',
-      data: {
-        username: app.globalData.username
+      header: {
+        Authorization: "Bearer " + app.globalData.token
       },
       success: function (res) {
         if (res.statusCode == 200) {
